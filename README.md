@@ -1,125 +1,114 @@
-# 🛍️ nestEcommerce - Veritabanı ve Backend Rehberi
+<p align="center">
+  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
+</p>
 
-Kafandaki tüm veritabanı, BaaS (Supabase, Firebase, Neon) ve ORM (Prisma, TypeORM, Mongoose) karmaşasını çözecek rehber aşağıdadır:
+[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
+[circleci-url]: https://circleci.com/gh/nestjs/nest
 
----
+  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
+    <p align="center">
+<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
+<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
+<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
+<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
+<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
+<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
+<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
+  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
+    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
+  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
+</p>
+  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
+  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## 💡 1. Büyük Resim (Bütün Katmanlar Tek Bakışta)
+## Description
 
-```
-┌────────────────────────────────────────────────────────────────────────┐
-│                        SENİN UYGULAMAN (Frontend / Mobile)             │
-└──────────────────────────────────┬─────────────────────────────────────┘
-                                   │
-       ┌───────────────────────────┴───────────────────────────┐
-       ▼                                                       ▼
-┌──────────────────────────────────────┐     ┌──────────────────────────────────┐
-│  A) Kendi Backend'ini Yazıyorsan     │     │  B) Hazır Backend Kullanıyorsan  │
-│     (NestJS, Express, Next.js)       │     │     (BaaS - Backend as a Service)│
-└──────────────────┬───────────────────┘     └─────────────────┬────────────────┘
-                   │                                           │
-         ┌─────────┴─────────┐                       ┌─────────┴─────────┐
-         ▼                   ▼                       ▼                   ▼
-    ┌─────────┐         ┌─────────┐             ┌───────────┐       ┌───────────┐
-    │   ORM   │         │   ORM   │             │ Supabase  │       │ Firebase  │
-    │ (Prisma │         │(TypeORM)│             │ (Postgres)│       │  (NoSQL)  │
-    └────┬────┘         └────┬────┘             └─────┬─────┘       └─────┬─────┘
-         │                   │                        │                   │
-         └─────────┬─────────┘                        │                   │
-                   ▼                                  │                   │
-  ┌─────────────────────────────────┐                 │                   │
-  │     GERÇEK VERİTABANI (Database) │◄────────────────┘                   │
-  │  PostgreSQL / Neon / MongoDB    │◄────────────────────────────────────┘
-  └─────────────────────────────────┘
+[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+
+## Project setup
+
+```bash
+$ npm install
 ```
 
----
+## Compile and run the project
 
-## 🏢 2. Ev İnşa Etme Benzetmesi
+```bash
+# development
+$ npm run start
 
-* **Veritabanı (PostgreSQL, MongoDB, Neon)**: Evin **arsası ve temel betonudur**. Verilerin kalıcı olarak saklandığı yerdir.
-* **ORM (Prisma, TypeORM, Mongoose)**: Arsayı kullanmanı kolaylaştıran **vinç ve iş makineleridir**. Veritabanı DEĞİLDİR, kod yazarken SQL cümleleri yazmak yerine JavaScript/TypeScript nesneleriyle çalışmanı sağlar.
-* **BaaS (Supabase, Firebase)**: **Hazır, mobilyalı prefabrik evdir**. İçinde veritabanı, güvenlik kapısı (Auth), deposu (Storage) ve elektrik tesisatı (Realtime API) kurulu gelir. Sıfırdan backend yazmak istemiyorsan bunu alıp direkt yaşamaya başlarsın.
+# watch mode
+$ npm run start:dev
 
----
+# production mode
+$ npm run start:prod
+```
 
-## 🧩 3. Kısaca Ne Nedir?
+## Run tests
 
-### 1. Supabase Nedir?
-* **Kategori**: BaaS (Backend as a Service) - Açık Kaynak Firebase Alternatifi.
-* **İçinde Ne Var?**: **PostgreSQL** Veritabanı + Kullanıcı Giriş/Kayıt (Auth) + Dosya Yükleme (Storage) + Canlı Veri (Realtime API).
-* **Şirketler Neden Kullanır?**: Sıfırdan 2 ayda yazacakları Auth, Storage ve DB altyapısını 5 dakikada kurmak için.
+```bash
+# unit tests
+$ npm run test
 
-### 2. Neon Database Nedir?
-* **Kategori**: Serverless PostgreSQL Database.
-* **Supabase'den Farkı**: SADECE VERİTABANIDIR (Auth/Storage yoktur).
-* **Özel Gücü**: Git gibi veritabanı **branching** yapabilirsin. Kullanılmadığında uyur, fatura düşer. Vercel Postgres'in altyapısıdır.
+# e2e tests
+$ npm run test:e2e
 
-### 3. Firebase Nedir? (MongoDB mi Kullanır?)
-* **Kategori**: BaaS (Google Ekosistemi).
-* **Veritabanı Motoru**: **MongoDB KULLANMAZ!** Google'ın kendi NoSQL veritabanı olan **Cloud Firestore**'u kullanır.
-* **Farkı**: Supabase ilişkisel SQL (Postgres) kullanırken, Firebase doküman tabanlı NoSQL (Firestore) kullanır.
+# test coverage
+$ npm run test:cov
+```
 
-### 4. MongoDB Nedir? (NoSQL = Sadece MongoDB mi?)
-* **Kategori**: Doküman Tabanlı NoSQL Veritabanı Markası.
-* **Açıklama**: "NoSQL / Doküman Tabanlı" bir veritabanı **kategorisidir**. MongoDB ise bu kategorinin en popüler **markasıdır** (Tıpkı "Elektrikli Otomobil" bir kategori, "Tesla" bir marka olduğu gibi).
-* **Farkı**: Verileri Tablo/Sütun olarak değil, **JSON objeleri** olarak saklar. Esnek şemalı veriler için idealdir.
+## Deployment
 
-### 5. Prisma, TypeORM & Drizzle ORM Nedir? (Prisma/Drizzle bir Supabase mi?)
-* **KESİNLİKLE HAYIR!** Bunlar veritabanı veya BaaS değildir. Bunlar **ORM / Query Builder (Kütüphane)**'dir.
-* **Ne Yaparlar?**: NestJS / Node.js / Next.js kodunun PostgreSQL, MySQL veya MongoDB ile SQL yazmadan TypeScript ile güvenli bir şekilde konuşmasını sağlar. (Drizzle ORM son dönemin en hızlı ve hafif ORM'lerinden biridir).
+When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
 
----
+If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
 
-## 📊 4. Özet Karşılaştırma Tablosu
+```bash
+$ npm install -g @nestjs/mau
+$ mau deploy
+```
 
-| Araç | Kategori | Veritabanı mı? | SQL / NoSQL | Ne İşe Yarar? |
-| :--- | :--- | :--- | :--- | :--- |
-| **PostgreSQL** | Veritabanı | **EVET** | SQL | İlişkisel veri saklar |
-| **MongoDB** | Veritabanı | **EVET** | NoSQL | Doküman/JSON veri saklar |
-| **Neon DB** | Serverless DB | **EVET** | SQL | Bulut PostgreSQL (Branching var) |
-| **Supabase** | BaaS | **İçinde PostgreSQL Var** | SQL (PostgreSQL) | DB + Auth + Storage + Realtime |
-| **Firebase** | BaaS | **İçinde Firestore Var** | NoSQL (Cloud Firestore) | DB + Auth + Storage + Analytics |
-| **Prisma / TypeORM / Drizzle** | ORM / Query Builder | **HAYIR** | SQL & NoSQL bağlar | Koda veritabanı bağlantı kütüphanesi |
+With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
 
----
+## Observability
 
-## 🛠️ 5. Gerçek Proje Senaryoları
+In production applications, observability is essential for understanding how your system behaves, detecting issues early, and maintaining reliable performance.
 
-1. **NestJS ile Kurumsal Backend (Bu Proje)**: NestJS + TypeORM/Prisma + PostgreSQL (Neon veya Docker Postgres). İş mantığını NestJS yazar.
-2. **Hızlı SaaS / Mobil MVP**: Next.js + Supabase. Backend yazmadan 1 günde ürün yayına alınır.
-3. **Canlı Chat / Mobil App**: Flutter + Firebase. Canlı veri akışı ve bildirimler için.
-4. **Esnek Ürün Kataloğu**: Node.js + Mongoose + MongoDB. Şeması değişen ürünler için.
+[NestJS Observe](https://observe.nestjs.com) automatically instruments your NestJS application, giving you deep visibility into your system with minimal setup:
 
----
+- **Distributed tracing:** Follow requests across services and understand how they flow through your system.
+- **Waterfall analysis:** Visualize request execution and identify slow operations, bottlenecks, and unexpected delays.
+- **Performance analysis:** Analyze application performance in real time and quickly pinpoint areas that need optimization.
+- **Metrics:** Track key application and infrastructure metrics to understand system health and performance trends.
+- **Logging:** Centralize and correlate logs with traces and other telemetry to make debugging easier.
+- **Error tracking:** Detect errors quickly and investigate their root causes with the surrounding context.
+- **SLA monitoring:** Track service-level objectives and identify when your application is approaching or exceeding defined thresholds.
+- **Alarms and alerts:** Set up alerts for critical errors, performance degradation, SLA violations, and other anomalies so your team can react quickly.
 
-## ⚡ 6. Serverless (Sunucusuz Mimari) Neden Kullanılır?
+## Resources
 
-"Serverless" demek fiziksel sunucu yok demek değildir. **"Sunucunun bakımıyla ben uğraşmıyorum, bulut şirketi (Vercel, Neon, AWS) yönetiyor"** demektir.
+Check out a few resources that may come in handy when working with NestJS:
 
-### 🎯 Neden Serverless Seçilir? (Avantajları)
+- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
+- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
+- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
+- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
+- Auto-instrument your application with [NestJS Observer](https://observer.nestjs.com). Distributed tracing, metrics, and logging made easy. Error tracking and performance monitoring for your NestJS applications.
+- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
+- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
+- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
+- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
 
-1. **💰 Muazzam Maliyet Tasarrufu (Kullandığın Kadar Öde)**:
-   * **Klasik Sunucu**: Ayda $50 ödersin. Gece 03:00'te hiç ziyaretçi olmasa da o $50'ı ödersin.
-   * **Serverless DB**: Ziyaretçi yoksa veritabanı uyur, $0 ödersin. Sadece istek geldiğinde çalışır ve milisaniyelik ödeme yaparsın. Yeni başlayan projeler için maliyeti neredeyse $0'dır.
+## Support
 
-2. **🚀 Anında ve Otomatik Ölçeklenme (Auto-Scaling)**:
-   * Siten anında bir televizyon programında veya sosyal medyada patladı diyelim.
-   * **Klasik Sunucu**: Aşırı yükten çöker (`502 Bad Gateway`).
-   * **Serverless DB**: Anında 1 sunucudan 500 sunuculuk güce milisaniyeler içinde kendi kendine büyür. Trafik geçince tekrar küçülür.
+Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
 
-3. **🛠️ Sıfır Sunucu Bakımı (DevOps Yok)**:
-   * Linux güncellemesi yapmak, Nginx yapılandırmak, Docker çökünce restart atmak gibi dertler yoktur.
+## Stay in touch
 
-### ⚠️ Tek Dezavantajı Nedir? (Cold Start - Soğuk Başlangıç)
-* Veritabanı veya sunucu uzun süre hiç kullanılmadıysa uyku moduna geçer.
-* İlk istek geldiğinde uyanması **100ms - 400ms** sürebilir. Buna "Soğuk Başlangıç" (Cold Start) denir. 
-* İkinci istekten itibaren ışık hızında çalışmaya devam eder.
+- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
+- Website - [https://nestjs.com](https://nestjs.com/)
+- Twitter - [@nestframework](https://twitter.com/nestframework)
 
----
+## License
 
-## ☁️ 7. Sunucu (Server), Cloud ve AWS Nedir?
-
-* **Sunucu (Server)**: İnternete bağlı, 7/24 kapanmayan, gelen isteklere (API isteği, web sitesi görüntüleme) yanıt veren **güçlü bir bilgisayardır**.
-* **Cloud (Bulut)**: Kendi evinde sunucu bilgisayarı tutmak yerine, internet üzerinden başkalarının dev veri merkezlerindeki sunucuları kiralama olayıdır.
-* **AWS (Amazon Web Services)**: Tek bir sunucu değildir! Dünyanın en büyük **Bulut Şirketidir (Cloud Provider)**. İçinde sunucu kiralama (EC2), veritabanı (RDS), dosya depolama (S3) gibi yüzlerce servis bulunur. (Tıpkı Google Cloud veya Microsoft Azure gibi).
+Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).

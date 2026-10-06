@@ -1,0 +1,125 @@
+# 🛍️ nestEcommerce - Veritabanı ve Backend Rehberi
+
+Kafandaki tüm veritabanı, BaaS (Supabase, Firebase, Neon) ve ORM (Prisma, TypeORM, Mongoose) karmaşasını çözecek rehber aşağıdadır:
+
+---
+
+## 💡 1. Büyük Resim (Bütün Katmanlar Tek Bakışta)
+
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│                        SENİN UYGULAMAN (Frontend / Mobile)             │
+└──────────────────────────────────┬─────────────────────────────────────┘
+                                   │
+       ┌───────────────────────────┴───────────────────────────┐
+       ▼                                                       ▼
+┌──────────────────────────────────────┐     ┌──────────────────────────────────┐
+│  A) Kendi Backend'ini Yazıyorsan     │     │  B) Hazır Backend Kullanıyorsan  │
+│     (NestJS, Express, Next.js)       │     │     (BaaS - Backend as a Service)│
+└──────────────────┬───────────────────┘     └─────────────────┬────────────────┘
+                   │                                           │
+         ┌─────────┴─────────┐                       ┌─────────┴─────────┐
+         ▼                   ▼                       ▼                   ▼
+    ┌─────────┐         ┌─────────┐             ┌───────────┐       ┌───────────┐
+    │   ORM   │         │   ORM   │             │ Supabase  │       │ Firebase  │
+    │ (Prisma │         │(TypeORM)│             │ (Postgres)│       │  (NoSQL)  │
+    └────┬────┘         └────┬────┘             └─────┬─────┘       └─────┬─────┘
+         │                   │                        │                   │
+         └─────────┬─────────┘                        │                   │
+                   ▼                                  │                   │
+  ┌─────────────────────────────────┐                 │                   │
+  │     GERÇEK VERİTABANI (Database) │◄────────────────┘                   │
+  │  PostgreSQL / Neon / MongoDB    │◄────────────────────────────────────┘
+  └─────────────────────────────────┘
+```
+
+---
+
+## 🏢 2. Ev İnşa Etme Benzetmesi
+
+* **Veritabanı (PostgreSQL, MongoDB, Neon)**: Evin **arsası ve temel betonudur**. Verilerin kalıcı olarak saklandığı yerdir.
+* **ORM (Prisma, TypeORM, Mongoose)**: Arsayı kullanmanı kolaylaştıran **vinç ve iş makineleridir**. Veritabanı DEĞİLDİR, kod yazarken SQL cümleleri yazmak yerine JavaScript/TypeScript nesneleriyle çalışmanı sağlar.
+* **BaaS (Supabase, Firebase)**: **Hazır, mobilyalı prefabrik evdir**. İçinde veritabanı, güvenlik kapısı (Auth), deposu (Storage) ve elektrik tesisatı (Realtime API) kurulu gelir. Sıfırdan backend yazmak istemiyorsan bunu alıp direkt yaşamaya başlarsın.
+
+---
+
+## 🧩 3. Kısaca Ne Nedir?
+
+### 1. Supabase Nedir?
+* **Kategori**: BaaS (Backend as a Service) - Açık Kaynak Firebase Alternatifi.
+* **İçinde Ne Var?**: **PostgreSQL** Veritabanı + Kullanıcı Giriş/Kayıt (Auth) + Dosya Yükleme (Storage) + Canlı Veri (Realtime API).
+* **Şirketler Neden Kullanır?**: Sıfırdan 2 ayda yazacakları Auth, Storage ve DB altyapısını 5 dakikada kurmak için.
+
+### 2. Neon Database Nedir?
+* **Kategori**: Serverless PostgreSQL Database.
+* **Supabase'den Farkı**: SADECE VERİTABANIDIR (Auth/Storage yoktur).
+* **Özel Gücü**: Git gibi veritabanı **branching** yapabilirsin. Kullanılmadığında uyur, fatura düşer. Vercel Postgres'in altyapısıdır.
+
+### 3. Firebase Nedir? (MongoDB mi Kullanır?)
+* **Kategori**: BaaS (Google Ekosistemi).
+* **Veritabanı Motoru**: **MongoDB KULLANMAZ!** Google'ın kendi NoSQL veritabanı olan **Cloud Firestore**'u kullanır.
+* **Farkı**: Supabase ilişkisel SQL (Postgres) kullanırken, Firebase doküman tabanlı NoSQL (Firestore) kullanır.
+
+### 4. MongoDB Nedir? (NoSQL = Sadece MongoDB mi?)
+* **Kategori**: Doküman Tabanlı NoSQL Veritabanı Markası.
+* **Açıklama**: "NoSQL / Doküman Tabanlı" bir veritabanı **kategorisidir**. MongoDB ise bu kategorinin en popüler **markasıdır** (Tıpkı "Elektrikli Otomobil" bir kategori, "Tesla" bir marka olduğu gibi).
+* **Farkı**: Verileri Tablo/Sütun olarak değil, **JSON objeleri** olarak saklar. Esnek şemalı veriler için idealdir.
+
+### 5. Prisma, TypeORM & Drizzle ORM Nedir? (Prisma/Drizzle bir Supabase mi?)
+* **KESİNLİKLE HAYIR!** Bunlar veritabanı veya BaaS değildir. Bunlar **ORM / Query Builder (Kütüphane)**'dir.
+* **Ne Yaparlar?**: NestJS / Node.js / Next.js kodunun PostgreSQL, MySQL veya MongoDB ile SQL yazmadan TypeScript ile güvenli bir şekilde konuşmasını sağlar. (Drizzle ORM son dönemin en hızlı ve hafif ORM'lerinden biridir).
+
+---
+
+## 📊 4. Özet Karşılaştırma Tablosu
+
+| Araç | Kategori | Veritabanı mı? | SQL / NoSQL | Ne İşe Yarar? |
+| :--- | :--- | :--- | :--- | :--- |
+| **PostgreSQL** | Veritabanı | **EVET** | SQL | İlişkisel veri saklar |
+| **MongoDB** | Veritabanı | **EVET** | NoSQL | Doküman/JSON veri saklar |
+| **Neon DB** | Serverless DB | **EVET** | SQL | Bulut PostgreSQL (Branching var) |
+| **Supabase** | BaaS | **İçinde PostgreSQL Var** | SQL (PostgreSQL) | DB + Auth + Storage + Realtime |
+| **Firebase** | BaaS | **İçinde Firestore Var** | NoSQL (Cloud Firestore) | DB + Auth + Storage + Analytics |
+| **Prisma / TypeORM / Drizzle** | ORM / Query Builder | **HAYIR** | SQL & NoSQL bağlar | Koda veritabanı bağlantı kütüphanesi |
+
+---
+
+## 🛠️ 5. Gerçek Proje Senaryoları
+
+1. **NestJS ile Kurumsal Backend (Bu Proje)**: NestJS + TypeORM/Prisma + PostgreSQL (Neon veya Docker Postgres). İş mantığını NestJS yazar.
+2. **Hızlı SaaS / Mobil MVP**: Next.js + Supabase. Backend yazmadan 1 günde ürün yayına alınır.
+3. **Canlı Chat / Mobil App**: Flutter + Firebase. Canlı veri akışı ve bildirimler için.
+4. **Esnek Ürün Kataloğu**: Node.js + Mongoose + MongoDB. Şeması değişen ürünler için.
+
+---
+
+## ⚡ 6. Serverless (Sunucusuz Mimari) Neden Kullanılır?
+
+"Serverless" demek fiziksel sunucu yok demek değildir. **"Sunucunun bakımıyla ben uğraşmıyorum, bulut şirketi (Vercel, Neon, AWS) yönetiyor"** demektir.
+
+### 🎯 Neden Serverless Seçilir? (Avantajları)
+
+1. **💰 Muazzam Maliyet Tasarrufu (Kullandığın Kadar Öde)**:
+   * **Klasik Sunucu**: Ayda $50 ödersin. Gece 03:00'te hiç ziyaretçi olmasa da o $50'ı ödersin.
+   * **Serverless DB**: Ziyaretçi yoksa veritabanı uyur, $0 ödersin. Sadece istek geldiğinde çalışır ve milisaniyelik ödeme yaparsın. Yeni başlayan projeler için maliyeti neredeyse $0'dır.
+
+2. **🚀 Anında ve Otomatik Ölçeklenme (Auto-Scaling)**:
+   * Siten anında bir televizyon programında veya sosyal medyada patladı diyelim.
+   * **Klasik Sunucu**: Aşırı yükten çöker (`502 Bad Gateway`).
+   * **Serverless DB**: Anında 1 sunucudan 500 sunuculuk güce milisaniyeler içinde kendi kendine büyür. Trafik geçince tekrar küçülür.
+
+3. **🛠️ Sıfır Sunucu Bakımı (DevOps Yok)**:
+   * Linux güncellemesi yapmak, Nginx yapılandırmak, Docker çökünce restart atmak gibi dertler yoktur.
+
+### ⚠️ Tek Dezavantajı Nedir? (Cold Start - Soğuk Başlangıç)
+* Veritabanı veya sunucu uzun süre hiç kullanılmadıysa uyku moduna geçer.
+* İlk istek geldiğinde uyanması **100ms - 400ms** sürebilir. Buna "Soğuk Başlangıç" (Cold Start) denir. 
+* İkinci istekten itibaren ışık hızında çalışmaya devam eder.
+
+---
+
+## ☁️ 7. Sunucu (Server), Cloud ve AWS Nedir?
+
+* **Sunucu (Server)**: İnternete bağlı, 7/24 kapanmayan, gelen isteklere (API isteği, web sitesi görüntüleme) yanıt veren **güçlü bir bilgisayardır**.
+* **Cloud (Bulut)**: Kendi evinde sunucu bilgisayarı tutmak yerine, internet üzerinden başkalarının dev veri merkezlerindeki sunucuları kiralama olayıdır.
+* **AWS (Amazon Web Services)**: Tek bir sunucu değildir! Dünyanın en büyük **Bulut Şirketidir (Cloud Provider)**. İçinde sunucu kiralama (EC2), veritabanı (RDS), dosya depolama (S3) gibi yüzlerce servis bulunur. (Tıpkı Google Cloud veya Microsoft Azure gibi).
