@@ -1,29 +1,21 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { dataSourceOptions } from '../db/data-source';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
-    // 1. ConfigModule: .env dosyasındaki değişkenleri (örneğin DATABASE_URL) okumamızı sağlar.
-    // isGlobal: true yaparak tüm projede (her modülde) erişilebilir hale getiriyoruz.
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
+    // ConfigModule: .env dosyasındaki değişkenleri uygulamanın her yerinde erişilebilir kılar
+    ConfigModule.forRoot({ isGlobal: true, }),
 
-    // 2. TypeOrmModule: NestJS ile PostgreSQL veritabanımız (Neon DB) arasındaki ana bağlantıyı kurar.
-    TypeOrmModule.forRoot({
-      type: 'postgres', // Veritabanı türümüz PostgreSQL
-      url: process.env.DATABASE_URL, // .env dosyasından okunan Neon DB bağlantı adresimiz
-      autoLoadEntities: true, // Projede oluşturacağımız tüm @Entity (tablo) sınıflarını otomatik bulur ve yükler
-      synchronize: true, // Geliştirme ortamında TypeScript sınıflarımıza göre veritabanı tablolarını OTOMATİK oluşturur
-      ssl: {
-        rejectUnauthorized: false, // Neon DB gibi bulut veritabanları SSL gerektirir, şifreli güvenli bağlantıyı sağlar
-      },
-    }),
+    // TypeOrmModule: db/data-source.ts içinde
+    // tanımladığımız konfigürasyonu içe aktararak Neon DB bağlantısını kurar
+    TypeOrmModule.forRoot(dataSourceOptions),
+
+    UsersModule,
   ],
-  controllers: [AppController], // Uygulamanın HTTP isteklerini (GET, POST) karşılayan controller sınıfları
-  providers: [AppService], // İş mantığının (business logic) yazıldığı servis sınıfları
+  controllers: [],
+  providers: [],
 })
-export class AppModule {}
+export class AppModule { }
