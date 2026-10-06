@@ -28,7 +28,7 @@ __decorate([
     __metadata("design:returntype", String)
 ], AppController.prototype, "getHello", null);
 exports.AppController = AppController = __decorate([
-    (0, common_1.Controller)(),
+    (0, common_1.Controller)("app"),
     __metadata("design:paramtypes", [app_service_js_1.AppService])
 ], AppController);
 //# sourceMappingURL=app.controller.js.map
