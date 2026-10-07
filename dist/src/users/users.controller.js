@@ -35,6 +35,12 @@ let UsersController = class UsersController {
     async findAll() {
         return await this.usersService.findAll();
     }
+    async getProfile(currentUser) {
+        if (!currentUser) {
+            throw new common_1.UnauthorizedException('Geçerli bir Token bulunamadı. Lütfen önce giriş yapın.');
+        }
+        return currentUser;
+    }
     async findById(id) {
         return await this.usersService.findById(+id);
     }
@@ -44,9 +50,6 @@ let UsersController = class UsersController {
     async delete(id) {
         const user = await this.usersService.delete(+id);
         return { message: "User deleted successfully", user };
-    }
-    async getProfile(currentUser) {
-        return currentUser;
     }
 };
 exports.UsersController = UsersController;
@@ -71,6 +74,13 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "findAll", null);
 __decorate([
+    (0, common_1.Get)("me"),
+    __param(0, (0, current_user_decorator_1.CurrentUser)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [user_entity_1.UserEntity]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "getProfile", null);
+__decorate([
     (0, common_1.Get)(":id"),
     __param(0, (0, common_1.Param)("id")),
     __metadata("design:type", Function),
@@ -92,13 +102,6 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "delete", null);
-__decorate([
-    (0, common_1.Get)("me"),
-    __param(0, (0, current_user_decorator_1.CurrentUser)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [user_entity_1.UserEntity]),
-    __metadata("design:returntype", Promise)
-], UsersController.prototype, "getProfile", null);
 exports.UsersController = UsersController = __decorate([
     (0, common_1.Controller)('users'),
     __metadata("design:paramtypes", [users_service_1.UsersService])

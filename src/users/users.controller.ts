@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, Patch, Delete, } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Patch, Delete, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserSignUpDto } from './dto/user-sign-up.dto';
 import { UserEntity } from './entities/user.entity';
@@ -27,6 +27,15 @@ export class UsersController {
     return await this.usersService.findAll();
   }
 
+  // O anki giriş yapmış kullanıcının kendi profilini getirme
+  @Get("me")
+  async getProfile(@CurrentUser() currentUser: UserEntity): Promise<UserEntity> {
+    if (!currentUser) {
+      throw new UnauthorizedException('Geçerli bir Token bulunamadı. Lütfen önce giriş yapın.');
+    }
+    return currentUser;
+  }
+
   @Get(":id")
   async findById(@Param("id") id: number): Promise<UserEntity | null> {
     return await this.usersService.findById(+id);
@@ -42,14 +51,4 @@ export class UsersController {
     const user = await this.usersService.delete(+id);
     return { message: "User deleted successfully", user }
   }
-
-
-  //sign in et sonra accestokeni gotur 
-  //users/me e Authorization: Bearer token seklinde  tokeni ekle 
-  //get requesti gonder
-  @Get("me")
-  async getProfile(@CurrentUser() currentUser: UserEntity): Promise<UserEntity> {
-    return currentUser;
-  }
-
 }

@@ -12,11 +12,11 @@ export declare class UsersController {
         user: UserEntity;
     }>;
     findAll(): Promise<UserEntity[]>;
+    getProfile(currentUser: UserEntity): Promise<UserEntity>;
     findById(id: number): Promise<UserEntity | null>;
     update(id: number, userUpdateDto: UpdateUserDto): Promise<UserEntity>;
     delete(id: number): Promise<{
         message: string;
         user: UserEntity | null;
     }>;
-    getProfile(currentUser: UserEntity): Promise<UserEntity>;
 }

@@ -20,14 +20,19 @@ let CurrentUserMiddleware = class CurrentUserMiddleware {
     }
     async use(req, res, next) {
         const authHeader = req.headers.authorization || req.headers.Authorization;
-        if (!authHeader || (0, class_validator_1.isArray)(authHeader) || !authHeader.startsWith('Bearer')) {
-            next();
+        if (!authHeader || (0, class_validator_1.isArray)(authHeader) || !authHeader.startsWith('Bearer ')) {
+            req.currentUser = undefined;
+            return next();
         }
-        else {
+        try {
             const token = authHeader.split(' ')[1];
             const { id } = (0, jsonwebtoken_1.verify)(token, process.env.JWT_ACCESS_TOKEN_SECRET);
             const currentUser = await this.usersService.findById(+id);
             req.currentUser = currentUser;
+            next();
+        }
+        catch (error) {
+            req.currentUser = undefined;
             next();
         }
     }

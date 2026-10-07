@@ -20,6 +20,11 @@ import { CurrentUserMiddleware } from './utility/middlewares/current-user.middle
   providers: [],
 })
 export class AppModule {
+  // Global Middleware Konfigürasyonu:
+  // CurrentUserMiddleware'i uygulamanın TÜM rotalarında
+  //  (path: "*", tüm HTTP isteklerinde) geçerli kılıyoruz.
+  // Böylece gelen her istekte token varsa otomatik doğrulanır ve 
+  // kullanıcı req.currentUser'a atanır.
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(CurrentUserMiddleware)
