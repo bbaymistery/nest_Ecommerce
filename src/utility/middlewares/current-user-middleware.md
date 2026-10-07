@@ -1,6 +1,6 @@
 # CurrentUserMiddleware ve @CurrentUser() Dekoratörü Çalışma Mantığı
 
- Bu doküman, NestJS projesinde kimlik doğrulama (Authentication), `CurrentUserMiddleware`, `@CurrentUser()` parametre dekoratörü ve `declare global` yapısının mimari çalışma prensiplerini açıklamaktadır.
+Bu doküman, NestJS projesinde kimlik doğrulama (Authentication), `CurrentUserMiddleware`, `@CurrentUser()` parametre dekoratörü ve `declare global` yapısının mimari çalışma prensiplerini açıklamaktadır.
 
 ---
 
@@ -51,7 +51,25 @@ Kullanıcı veritabanından **zaten Middleware seviyesinde çekildiği için**, 
 
 ---
 
-## 3. `declare global` ve Interface Merging Mantığı
+## 3. Klasik İstek Akışı ile Middleware Akışının Karşılaştırılması
+
+### A. Klasik / Normal İstek Akışı (Örn: `GET /users/5`)
+1. **İstemci** isteği atar.
+2. İstek **Controller**'a ulaşır.
+3. **Controller** ──► **Service**'e gider (`this.usersService.findById(5)`).
+4. **Service** ──► **Veritabanına (Repository)** gider, veriyi çeker ve **Controller**'a döner.
+5. **Controller** ──► Yanıtı **İstemci**ye gönderir.
+
+### B. Bizim `GET /users/me` (Profil) İstek Akışı
+1. **İstemci** isteği atar.
+2. İstek **Controller'a daha ulaşmadan** kapıdaki görevli olan **Middleware** isteği yakalar.
+3. **Middleware** ──► **Service** üzerinden veritabanına gider (`usersService.findById()`), kullanıcıyı bulur ve isteğin çantasına (`req.currentUser`) koyar.
+4. **Middleware** isteği **Controller**'a devreder.
+5. **Controller** zaten çantada (RAM'de) hazır olan `currentUser` nesnesini alır ve hiçbir Service'e gitmeden doğrudan **İstemci**ye yanıtı döner.
+
+---
+
+## 4. `declare global` ve Interface Merging Mantığı
 
 ```typescript
 declare global {
