@@ -1,5 +1,4 @@
-export declare class UserSignUpDto {
+import { UserSignInDto } from "./user-signin.dto";
+export declare class UserSignUpDto extends UserSignInDto {
     name: string;
-    email: string;
-    password: string;
 }

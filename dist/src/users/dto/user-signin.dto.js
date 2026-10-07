@@ -9,15 +9,20 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UserSignUpDto = void 0;
+exports.UserSignInDto = void 0;
 const class_validator_1 = require("class-validator");
-const user_signin_dto_1 = require("./user-signin.dto");
-class UserSignUpDto extends user_signin_dto_1.UserSignInDto {
+class UserSignInDto {
 }
-exports.UserSignUpDto = UserSignUpDto;
+exports.UserSignInDto = UserSignInDto;
 __decorate([
-    (0, class_validator_1.IsString)({ message: "Name must be a string" }),
-    (0, class_validator_1.IsNotEmpty)({ message: "Name can not be null" }),
+    (0, class_validator_1.IsEmail)({}, { message: "Email formatı doğru değil" }),
+    (0, class_validator_1.IsNotEmpty)({ message: "Email alanı boş bırakılamaz." }),
     __metadata("design:type", String)
-], UserSignUpDto.prototype, "name", void 0);
-//# sourceMappingURL=user-sign-up.dto.js.map
+], UserSignInDto.prototype, "email", void 0);
+__decorate([
+    (0, class_validator_1.IsString)({ message: "Password must be a string" }),
+    (0, class_validator_1.IsNotEmpty)({ message: "Password can not be null" }),
+    (0, class_validator_1.MinLength)(5, { message: "Password must be at least 5 characters long" }),
+    __metadata("design:type", String)
+], UserSignInDto.prototype, "password", void 0);
+//# sourceMappingURL=user-signin.dto.js.map

@@ -17,25 +17,38 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const user_entity_1 = require("./entities/user.entity");
 const typeorm_2 = require("typeorm");
+const bcrypt = require("bcrypt");
 let UsersService = class UsersService {
     constructor(userRepository) {
         this.userRepository = userRepository;
     }
     async signup(userSignUpDto) {
+        const existingUser = await this.findUserByEmail(userSignUpDto.email);
+        if (existingUser) {
+            throw new common_1.BadRequestException('Bu email adresi zaten kullanılıyor.');
+        }
+        const hashedPassword = await bcrypt.hash(userSignUpDto.password, 10);
+        userSignUpDto.password = hashedPassword;
         const user = this.userRepository.create(userSignUpDto);
         return await this.userRepository.save(user);
     }
-    findAll() {
-        return `This action returns all users`;
+    async signin(userSignInDto) {
+        const user = await this.userRepository
+            .createQueryBuilder('user')
+            .addSelect('user.password')
+            .where('user.email = :email', { email: userSignInDto.email })
+            .getOne();
+        if (!user) {
+            throw new common_1.BadRequestException('Kullanıcı bulunamadı.');
+        }
+        const isPasswordValid = await bcrypt.compare(userSignInDto.password, user.password);
+        if (!isPasswordValid) {
+            throw new common_1.BadRequestException('Şifre yanlış.');
+        }
+        return user;
     }
-    findOne(id) {
-        return `This action returns a #${id} user`;
-    }
-    update(id, updateUserDto) {
-        return `This action updates a #${id} user`;
-    }
-    remove(id) {
-        return `This action removes a #${id} user`;
+    async findUserByEmail(email) {
+        return await this.userRepository.findOneBy({ email });
     }
 };
 exports.UsersService = UsersService;

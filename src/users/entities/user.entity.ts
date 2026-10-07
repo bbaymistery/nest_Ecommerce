@@ -1,5 +1,6 @@
+import { Timestamp } from 'typeorm/driver/mongodb/bson.typings.js';
 import { Roles } from '../../utility/common/user-roles.enum';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { CreateDateColumn, Column, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 /**
  * USER ENTITY (Kullanıcı Veritabanı Tablo Şeması)
@@ -21,11 +22,12 @@ export class UserEntity {
   name: string;
 
   // @Column() -> Veritabanında 'email' adında metin sütunu oluşturur.
-  @Column()
+  @Column({ unique: true })
   email: string;
 
   // @Column() -> Kullanıcının şifresini tutacak sütun.
-  @Column()
+  //> false means  > SELECT (getirme) sorgularında görünmez.
+  @Column({ select: false })
   password: string;
 
   /**
@@ -40,6 +42,13 @@ export class UserEntity {
     default: [Roles.USER], // Yeni kaydolan kullanıcının varsayılan rolü 'user' olur
   })
   role: Roles[];
+
+  @CreateDateColumn()
+  createdAt: Timestamp;
+
+  @UpdateDateColumn()
+  updatedAt: Timestamp;
+
 }
 
 
