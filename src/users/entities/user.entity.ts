@@ -41,3 +41,13 @@ export class UserEntity {
   })
   role: Roles[];
 }
+
+
+
+/*
+Entity (UserEntity): Neon PostgreSQL veritabanınızdaki GERÇEK TABLO ŞEMASIDIR.
+Amacı: Veritabanı sütunlarını (id, name, email, password, role, createdAt) tanımlamaktır.
+Neden Farklılar? Kullanıcı kaydolurken DTO sadece name, email, password alır. 
+Ancak veritabanına (Entity) kaydolurken bunlara ek olarak otomatik id, 
+varsayılan role: ["user"] gibi dışarıdan gönderilmeyen iç veriler de eklenir.
+*/

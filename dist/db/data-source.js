@@ -7,10 +7,10 @@ const dotenv_1 = require("dotenv");
 exports.dataSourceOptions = {
     type: 'postgres',
     url: process.env.DATABASE_URL,
-    entities: ['dist/**/*.entity{.ts,.js}'],
-    migrations: ['dist/db/migrations/*{.ts,.js}'],
+    entities: ['dist/**/*.entity.js'],
+    migrations: ['dist/db/migrations/*.js'],
     logging: false,
-    synchronize: true,
+    synchronize: false,
     ssl: {
         rejectUnauthorized: false,
     },

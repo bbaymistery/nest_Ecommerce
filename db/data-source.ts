@@ -14,10 +14,10 @@ export const dataSourceOptions: DataSourceOptions = {
 
   // Bu ayar TypeORM'a der ki: "dist/ klasörünün altındaki sonu 
   // .entity.js ile biten TÜM dosyaları bul ve veritabanı tablosu yap."
-  entities: ['src/**/*.entity{.ts,.js}'],
+  entities: ['dist/**/*.entity.js'],
 
   // 2. MIGRATIONS (Veritabanı Versiyonlama ve Değişiklik Geçmişi):
-  migrations: ['db/migrations/*{.ts,.js}'],
+  migrations: ['dist/db/migrations/*.js'],
 
   logging: false,
   // Migration kullanırken synchronize false olmalıdır

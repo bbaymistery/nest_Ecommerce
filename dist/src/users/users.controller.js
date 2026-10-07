@@ -21,8 +21,8 @@ let UsersController = class UsersController {
     constructor(usersService) {
         this.usersService = usersService;
     }
-    create(createUserDto) {
-        return this.usersService.create(createUserDto);
+    async signup(createUserDto) {
+        return await this.usersService.signup(createUserDto);
     }
     findAll() {
         return this.usersService.findAll();
@@ -39,12 +39,12 @@ let UsersController = class UsersController {
 };
 exports.UsersController = UsersController;
 __decorate([
-    (0, common_1.Post)(),
+    (0, common_1.Post)("signup"),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_user_dto_1.CreateUserDto]),
-    __metadata("design:returntype", void 0)
-], UsersController.prototype, "create", null);
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "signup", null);
 __decorate([
     (0, common_1.Get)(),
     __metadata("design:type", Function),
