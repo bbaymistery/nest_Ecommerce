@@ -18,6 +18,7 @@ const typeorm_1 = require("@nestjs/typeorm");
 const user_entity_1 = require("./entities/user.entity");
 const typeorm_2 = require("typeorm");
 const bcrypt = require("bcrypt");
+const jsonwebtoken_1 = require("jsonwebtoken");
 let UsersService = class UsersService {
     constructor(userRepository) {
         this.userRepository = userRepository;
@@ -25,10 +26,9 @@ let UsersService = class UsersService {
     async signup(userSignUpDto) {
         const existingUser = await this.findUserByEmail(userSignUpDto.email);
         if (existingUser) {
-            throw new common_1.BadRequestException('Bu email adresi zaten kullanılıyor.');
+            throw new common_1.ConflictException('Bu email adresi zaten kullanılıyor.');
         }
-        const hashedPassword = await bcrypt.hash(userSignUpDto.password, 10);
-        userSignUpDto.password = hashedPassword;
+        userSignUpDto.password = await bcrypt.hash(userSignUpDto.password, 10);
         const user = this.userRepository.create(userSignUpDto);
         return await this.userRepository.save(user);
     }
@@ -39,13 +39,34 @@ let UsersService = class UsersService {
             .where('user.email = :email', { email: userSignInDto.email })
             .getOne();
         if (!user) {
-            throw new common_1.BadRequestException('Kullanıcı bulunamadı.');
+            throw new common_1.UnauthorizedException('E-posta veya şifre hatalı.');
         }
         const isPasswordValid = await bcrypt.compare(userSignInDto.password, user.password);
         if (!isPasswordValid) {
-            throw new common_1.BadRequestException('Şifre yanlış.');
+            throw new common_1.UnauthorizedException('E-posta veya şifre hatalı.');
         }
         return user;
+    }
+    async accesToken(user) {
+        return (0, jsonwebtoken_1.sign)({ id: user.id, email: user.email }, process.env.JWT_ACCESS_TOKEN_SECRET, { expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRE_TIME });
+    }
+    async findAll() {
+        return await this.userRepository.find();
+    }
+    async findById(id) {
+        const user = await this.userRepository.findOne({ where: { id } });
+        if (!user) {
+            throw new common_1.NotFoundException(`ID'si ${id} olan kullanıcı bulunamadı.`);
+        }
+        return user;
+    }
+    async update(id, userUpdateDto) {
+        const user = await this.findById(id);
+        return await this.userRepository.save({ ...user, ...userUpdateDto });
+    }
+    async delete(id) {
+        const user = await this.findById(id);
+        return await this.userRepository.remove(user);
     }
     async findUserByEmail(email) {
         return await this.userRepository.findOneBy({ email });

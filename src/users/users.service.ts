@@ -1,59 +1,95 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { UpdateUserDto } from './dto/update-user.dto';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { UserSignUpDto } from './dto/user-sign-up.dto';
 import * as bcrypt from 'bcrypt';
 import { UserSignInDto } from './dto/user-signin.dto';
+import { sign, SignOptions } from 'jsonwebtoken';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
-
   constructor(
     @InjectRepository(UserEntity)
-    private readonly userRepository: Repository<UserEntity>
+    private readonly userRepository: Repository<UserEntity>,
   ) { }
 
   async signup(userSignUpDto: UserSignUpDto): Promise<UserEntity> {
-
-    //checking if the user already exists
+    // 1. Zaten kayıtlı mı kontrolü (409 Conflict)
     const existingUser = await this.findUserByEmail(userSignUpDto.email);
     if (existingUser) {
-      throw new BadRequestException('Bu email adresi zaten kullanılıyor.');
+      throw new ConflictException('Bu email adresi zaten kullanılıyor.');
     }
 
-    //password hashing
-    const hashedPassword = await bcrypt.hash(userSignUpDto.password, 10);
-    userSignUpDto.password = hashedPassword;
+    // 2. Şifre Hashleme
+    userSignUpDto.password = await bcrypt.hash(userSignUpDto.password, 10);
 
     const user = this.userRepository.create(userSignUpDto);
     return await this.userRepository.save(user);
   }
 
   async signin(userSignInDto: UserSignInDto): Promise<UserEntity> {
-    // .addSelect('user.password') ile gizli olan şifreyi SADECE Giriş Yaparken özel olarak çekiyoruz
     const user = await this.userRepository
       .createQueryBuilder('user')
       .addSelect('user.password')
       .where('user.email = :email', { email: userSignInDto.email })
       .getOne();
 
+    // Güvenlik İlkesi (User Enumeration Önleme): İkisine de 401 Unauthorized verilir
     if (!user) {
-      throw new BadRequestException('Kullanıcı bulunamadı.');
+      throw new UnauthorizedException('E-posta veya şifre hatalı.');
     }
 
-    const isPasswordValid = await bcrypt.compare(userSignInDto.password, user.password);
+    const isPasswordValid = await bcrypt.compare(
+      userSignInDto.password,
+      user.password,
+    );
     if (!isPasswordValid) {
-      throw new BadRequestException('Şifre yanlış.');
+      throw new UnauthorizedException('E-posta veya şifre hatalı.');
     }
     return user;
   }
 
+  async accesToken(user: UserEntity): Promise<string> {
+    return sign(
+      { id: user.id, email: user.email },
+      process.env.JWT_ACCESS_TOKEN_SECRET as string,
+      { expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRE_TIME } as SignOptions,
+    );
+  }
+
+  async findAll(): Promise<UserEntity[]> {
+    return await this.userRepository.find();
+  }
+
+  async findById(id: number): Promise<UserEntity> {
+    const user = await this.userRepository.findOne({ where: { id } });
+    if (!user) {
+      throw new NotFoundException(`ID'si ${id} olan kullanıcı bulunamadı.`);
+    }
+    return user;
+  }
+
+  async update(id: number, userUpdateDto: UpdateUserDto): Promise<UserEntity> {
+    // findById kullanıcının olup olmadığını zaten kontrol ediyor ve yoksa 404 fırlatıyor (DRY)
+    const user = await this.findById(id);
+    return await this.userRepository.save({ ...user, ...userUpdateDto });
+  }
+
+  async delete(id: number): Promise<UserEntity> {
+    // findById kullanıcının olup olmadığını zaten kontrol ediyor ve yoksa 404 fırlatıyor (DRY)
+    const user = await this.findById(id);
+    return await this.userRepository.remove(user);
+  }
+
   /**
    * Kullanıcının email adresine göre bulunması
-   * @param email email adresi
-   * @returns Kullanıcı entity
    */
   async findUserByEmail(email: string): Promise<UserEntity | null> {
     return await this.userRepository.findOneBy({ email });

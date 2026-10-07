@@ -1,8 +1,10 @@
-import { Controller, Post, Body, } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Patch, Delete, } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserSignUpDto } from './dto/user-sign-up.dto';
 import { UserEntity } from './entities/user.entity';
 import { UserSignInDto } from './dto/user-signin.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { CurrentUser } from 'src/utility/decorators/current-user.decorator';
 
 @Controller('users')
 export class UsersController {
@@ -14,7 +16,40 @@ export class UsersController {
   }
 
   @Post("signin")
-  async signin(@Body() userSignInDto: UserSignInDto): Promise<UserEntity> {
-    return await this.usersService.signin(userSignInDto);
+  async signin(@Body() userSignInDto: UserSignInDto): Promise<{ accesToken: string, user: UserEntity }> {
+    const user = await this.usersService.signin(userSignInDto);
+    const accesToken = await this.usersService.accesToken(user);
+    return { accesToken, user }
   }
+
+  @Get()
+  async findAll(): Promise<UserEntity[]> {
+    return await this.usersService.findAll();
+  }
+
+  @Get(":id")
+  async findById(@Param("id") id: number): Promise<UserEntity | null> {
+    return await this.usersService.findById(+id);
+  }
+
+  @Patch(":id")
+  async update(@Param("id") id: number, @Body() userUpdateDto: UpdateUserDto): Promise<UserEntity> {
+    return await this.usersService.update(+id, userUpdateDto);
+  }
+
+  @Delete(":id")
+  async delete(@Param("id") id: number): Promise<{ message: string, user: UserEntity | null }> {
+    const user = await this.usersService.delete(+id);
+    return { message: "User deleted successfully", user }
+  }
+
+
+  //sign in et sonra accestokeni gotur 
+  //users/me e Authorization: Bearer token seklinde  tokeni ekle 
+  //get requesti gonder
+  @Get("me")
+  async getProfile(@CurrentUser() currentUser: UserEntity): Promise<UserEntity> {
+    return currentUser;
+  }
+
 }
