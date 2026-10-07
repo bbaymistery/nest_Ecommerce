@@ -14,19 +14,14 @@ export const dataSourceOptions: DataSourceOptions = {
 
   // Bu ayar TypeORM'a der ki: "dist/ klasörünün altındaki sonu 
   // .entity.js ile biten TÜM dosyaları bul ve veritabanı tablosu yap."
-  entities: ['dist/**/*.entity{.ts,.js}'],
+  entities: ['src/**/*.entity{.ts,.js}'],
 
   // 2. MIGRATIONS (Veritabanı Versiyonlama ve Değişiklik Geçmişi):
-  // Tıpkı Git ile kodlarımızın geçmişini (commit) tuttuğumuz gibi,
-  //  veritabanındaki tablo değişikliklerinin de geçmişini tutarız.
-
-  // Bu ayar TypeORM'a der ki: "Veritabanına bir güncelleme yapacağın 
-  // zaman dist/db/migrations/ içindeki .js dosyalarını sırayla çalıştır."
-  migrations: ['dist/db/migrations/*.js'],
+  migrations: ['db/migrations/*{.ts,.js}'],
 
   logging: false,
-  // Geliştirme aşamasında TypeScript sınıflarımıza göre tabloları veritabanında OTOMATİK oluşturur
-  synchronize: true,
+  // Migration kullanırken synchronize false olmalıdır
+  synchronize: false,
   ssl: {
     rejectUnauthorized: false, // Neon DB bulut veritabanı için gerekli SSL şifreleme ayarı
   },
