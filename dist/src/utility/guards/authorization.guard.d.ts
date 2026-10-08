@@ -1,7 +1,2 @@
-import { CanActivate, ExecutionContext } from "@nestjs/common";
-import { Reflector } from "@nestjs/core";
-export declare class AuthorizeGuard implements CanActivate {
-    private reflector;
-    constructor(reflector: Reflector);
-    canActivate(context: ExecutionContext): boolean;
-}
+import { CanActivate, Type } from "@nestjs/common";
+export declare const AuthorizeGuard: (roles: string | string[]) => Type<CanActivate>;

@@ -21,7 +21,6 @@ const user_signin_dto_1 = require("./dto/user-signin.dto");
 const update_user_dto_1 = require("./dto/update-user.dto");
 const current_user_decorator_1 = require("../utility/decorators/current-user.decorator");
 const authentication_guard_1 = require("../utility/guards/authentication.guard");
-const authorize_roles_decorator_1 = require("../utility/decorators/authorize-roles.decorator");
 const user_roles_enum_1 = require("../utility/common/user-roles.enum");
 const authorization_guard_1 = require("../utility/guards/authorization.guard");
 let UsersController = class UsersController {
@@ -72,8 +71,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "signin", null);
 __decorate([
-    (0, authorize_roles_decorator_1.AuthorizeRoles)(user_roles_enum_1.Roles.ADMIN),
-    (0, common_1.UseGuards)(authentication_guard_1.AuthenticationGuard, authorization_guard_1.AuthorizeGuard),
+    (0, common_1.UseGuards)(authentication_guard_1.AuthenticationGuard, (0, authorization_guard_1.AuthorizeGuard)(user_roles_enum_1.Roles.ADMIN)),
     (0, common_1.Get)(),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),

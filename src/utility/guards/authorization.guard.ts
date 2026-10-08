@@ -1,44 +1,42 @@
 
 
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
-import { Reflector } from "@nestjs/core";
+import { CanActivate, ExecutionContext, Injectable, mixin, Type, UnauthorizedException } from "@nestjs/common";
 
 /**
- * 2. AUTHORIZE GUARD (YETKİLENDİRME / ROL KONTROL GÜVENLİK GÖREVLİSİ)
+ * AUTHORIZE GUARD (DİNAMİK ROL GÜVENLİK GÖREVLİSİ)
  * 
- * Soru: "Senin BURAYA GİRMEYE YETKİN VAR MI?" / "Rolün ne?"
+ * Artık ayrı bir @AuthorizeRoles() dekoratörüne gerek kalmadan 
+ * doğrudan Guard içerisinde parametre olarak rol gönderebilirsin!
  * 
- * Görevi: Sisteme giriş yapmış kullanıcının hedef metoda (Örn: @AuthorizeRoles('admin')) 
- * erişmek için gerekli ROLÜNE sahip olup olmadığını kontrol eder.
- * 
- * Analoji 👑: Kulübe girdikten sonra VIP ODASININ KAPISINDAKİ YETKİ KONTROLÜ.
- * Kapıdaki görevli: "Evet kimliğin var (Authentication tamam), ama bakalım VIP kartın (Admin rolün) var mı?"
+ * Örnek Kullanım:
+ * @UseGuards(AuthenticationGuard, AuthorizeGuard(Roles.ADMIN))
+ * veya birden fazla rol için:
+ * @UseGuards(AuthenticationGuard, AuthorizeGuard([Roles.ADMIN, Roles.USER]))
  */
-@Injectable()
-export class AuthorizeGuard implements CanActivate {
-    // Reflector: Controller metodunun üzerindeki @AuthorizeRoles(...) dekoratöründen eklediğimiz metadata'yı okur
-    constructor(private reflector: Reflector) { }
+export const AuthorizeGuard = (roles: string | string[]): Type<CanActivate> => {
+    // Parametre olarak tek string gelirse diziye çeviriyoruz (Örn: 'admin' -> ['admin'])
+    const allowedRoles = Array.isArray(roles) ? roles : [roles];
 
-    canActivate(context: ExecutionContext): boolean {
-        // 1. Controller metodunun üzerindeki @AuthorizeRoles('admin', 'user') dekoratöründen izin verilen rolleri çekiyoruz
-        const allowedRoles = this.reflector.get<string[]>('allowedRoles', context.getHandler());
+    @Injectable()
+    class AuthorizeGuardMixin implements CanActivate {
+        canActivate(context: ExecutionContext): boolean {
+            // 1. HTTP Request nesnesini alıyoruz
+            const request = context.switchToHttp().getRequest();
 
-        // Eğer metoda herhangi bir rol kısıtlaması konulmamışsa herkese izin ver
-        if (!allowedRoles) return true;
+            // 2. Oturum açan kullanıcının rollerini alıyoruz
+            const userRoles: string[] = request?.currentUser?.role || request?.currentUser?.roles || [];
 
-        // 2. HTTP Request nesnesini alıyoruz
-        const request = context.switchToHttp().getRequest();
+            // 3. Kullanıcının rollerinden en az bir tanesi izin verilen roller (allowedRoles) listesinde var mı kontrol ediyoruz
+            const hasPermission = userRoles.some((role: string) => allowedRoles.includes(role));
 
-        // 3. Kullanıcının rollerini alıyoruz (UserEntity içinde 'role' dizisi olarak saklanır)
-        const userRoles: string[] = request?.currentUser?.role || request?.currentUser?.roles || [];
+            // Yetkisi varsa geçişe izin ver
+            if (hasPermission) return true;
 
-        // 4. Kullanıcının rollerinden en az bir tanesi izin verilen roller (allowedRoles) listesinde var mı bakıyoruz
-        const hasPermission = userRoles.some((role: string) => allowedRoles.includes(role));
-
-        // Yetkisi varsa geçişe izin ver
-        if (hasPermission) return true;
-
-        // Yetkisi yoksa (Örn: Normal kullanıcı Admin sayfasına girmeye çalışıyorsa) hatayı fırlat
-        throw new UnauthorizedException("Bu işlem için yetkiniz bulunmamaktadır (Erişim Engellendi).");
+            // Yetkisi yoksa 401 UnauthorizedException hatası fırlat
+            throw new UnauthorizedException("Bu işlem için yetkiniz bulunmamaktadır (Erişim Engellendi).");
+        }
     }
-}
+
+    return mixin(AuthorizeGuardMixin);
+};
+
