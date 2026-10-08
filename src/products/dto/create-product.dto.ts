@@ -29,5 +29,5 @@ export class CreateProductDto {
 
     @IsNumber({}, { message: 'Kategori ID sayı formatında olmalıdır.' })
     @IsNotEmpty({ message: 'Kategori ID zorunludur.' })
-    category: number;
+    categoryId: number;
 }

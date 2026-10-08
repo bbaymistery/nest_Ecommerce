@@ -4,5 +4,5 @@ export declare class CreateProductDto {
     price: number;
     stock: number;
     images: [];
-    category: number;
+    categoryId: number;
 }

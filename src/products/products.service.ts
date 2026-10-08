@@ -1,14 +1,36 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ProductEntity } from './entities/product.entity';
+import { Repository } from 'typeorm';
+import { CategoryEntity } from 'src/categories/entities/category.entity';
+import { UserEntity } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class ProductsService {
-  create(createProductDto: CreateProductDto) {
-    return 'This action adds a new product';
+
+
+  constructor(
+    @InjectRepository(ProductEntity) private productRepository: Repository<ProductEntity>,
+    private categoryRepository: Repository<CategoryEntity>,
+  ) { }
+
+  async create(createProductDto: CreateProductDto, currentUser: UserEntity): Promise<ProductEntity> {
+    const category = await this.categoryRepository.findOne({ where: { id: createProductDto.categoryId } });
+    if (!category) {
+      throw new NotFoundException("Category not found");
+    }
+
+    //asagidaki ile eynidi this.productRepository.create(createProductDto);
+    //p =Object.assign(ProductEntity,createProductDto)
+    const product = this.productRepository.create(createProductDto);
+    product.addedBy = currentUser;
+    product.category = category;
+    return await this.productRepository.save(product);
   }
 
-  findAll() {
+  async findAll() {
     return `This action returns all products`;
   }
 

@@ -45,5 +45,5 @@ __decorate([
     (0, class_validator_1.IsNumber)({}, { message: 'Kategori ID sayı formatında olmalıdır.' }),
     (0, class_validator_1.IsNotEmpty)({ message: 'Kategori ID zorunludur.' }),
     __metadata("design:type", Number)
-], CreateProductDto.prototype, "category", void 0);
+], CreateProductDto.prototype, "categoryId", void 0);
 //# sourceMappingURL=create-product.dto.js.map

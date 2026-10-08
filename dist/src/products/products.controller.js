@@ -17,12 +17,17 @@ const common_1 = require("@nestjs/common");
 const products_service_1 = require("./products.service");
 const create_product_dto_1 = require("./dto/create-product.dto");
 const update_product_dto_1 = require("./dto/update-product.dto");
+const authentication_guard_1 = require("../utility/guards/authentication.guard");
+const authorization_guard_1 = require("../utility/guards/authorization.guard");
+const user_roles_enum_1 = require("../utility/common/user-roles.enum");
+const current_user_decorator_1 = require("../utility/decorators/current-user.decorator");
+const user_entity_1 = require("../users/entities/user.entity");
 let ProductsController = class ProductsController {
     constructor(productsService) {
         this.productsService = productsService;
     }
-    create(createProductDto) {
-        return this.productsService.create(createProductDto);
+    async create(createProductDto, currentUser) {
+        return await this.productsService.create(createProductDto, currentUser);
     }
     findAll() {
         return this.productsService.findAll();
@@ -40,10 +45,12 @@ let ProductsController = class ProductsController {
 exports.ProductsController = ProductsController;
 __decorate([
     (0, common_1.Post)(),
+    (0, common_1.UseGuards)(authentication_guard_1.AuthenticationGuard, (0, authorization_guard_1.AuthorizeGuard)(user_roles_enum_1.Roles.ADMIN)),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, current_user_decorator_1.CurrentUser)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_product_dto_1.CreateProductDto]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:paramtypes", [create_product_dto_1.CreateProductDto, user_entity_1.UserEntity]),
+    __metadata("design:returntype", Promise)
 ], ProductsController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
