@@ -14,6 +14,9 @@ const user_entity_1 = require("../../users/entities/user.entity");
 const typeorm_1 = require("typeorm");
 const bson_typings_js_1 = require("typeorm/driver/mongodb/bson.typings.js");
 let CategoryEntity = class CategoryEntity {
+    constructor() {
+        this.is_active = true;
+    }
 };
 exports.CategoryEntity = CategoryEntity;
 __decorate([
@@ -29,7 +32,7 @@ __decorate([
     __metadata("design:type", String)
 ], CategoryEntity.prototype, "description", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ default: true }),
     __metadata("design:type", Boolean)
 ], CategoryEntity.prototype, "is_active", void 0);
 __decorate([

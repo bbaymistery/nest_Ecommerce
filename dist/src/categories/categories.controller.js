@@ -17,61 +17,70 @@ const common_1 = require("@nestjs/common");
 const categories_service_1 = require("./categories.service");
 const create_category_dto_1 = require("./dto/create-category.dto");
 const update_category_dto_1 = require("./dto/update-category.dto");
+const current_user_decorator_1 = require("../utility/decorators/current-user.decorator");
+const user_entity_1 = require("../users/entities/user.entity");
+const authentication_guard_1 = require("../utility/guards/authentication.guard");
+const authorization_guard_1 = require("../utility/guards/authorization.guard");
+const user_roles_enum_1 = require("../utility/common/user-roles.enum");
 let CategoriesController = class CategoriesController {
     constructor(categoriesService) {
         this.categoriesService = categoriesService;
     }
-    create(createCategoryDto) {
-        return this.categoriesService.create(createCategoryDto);
+    async create(createCategoryDto, currentUser) {
+        return await this.categoriesService.create(createCategoryDto, currentUser);
     }
-    findAll() {
-        return this.categoriesService.findAll();
+    async findAll() {
+        return await this.categoriesService.findAll();
     }
-    findOne(id) {
-        return this.categoriesService.findOne(+id);
+    async findOne(id) {
+        return await this.categoriesService.findOne(+id);
     }
-    update(id, updateCategoryDto) {
-        return this.categoriesService.update(+id, updateCategoryDto);
+    async update(id, updateCategoryDto) {
+        return await this.categoriesService.update(+id, updateCategoryDto);
     }
-    remove(id) {
-        return this.categoriesService.remove(+id);
+    async remove(id) {
+        return await this.categoriesService.remove(+id);
     }
 };
 exports.CategoriesController = CategoriesController;
 __decorate([
     (0, common_1.Post)(),
+    (0, common_1.UseGuards)(authentication_guard_1.AuthenticationGuard, (0, authorization_guard_1.AuthorizeGuard)(user_roles_enum_1.Roles.ADMIN)),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, current_user_decorator_1.CurrentUser)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_category_dto_1.CreateCategoryDto]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:paramtypes", [create_category_dto_1.CreateCategoryDto, user_entity_1.UserEntity]),
+    __metadata("design:returntype", Promise)
 ], CategoriesController.prototype, "create", null);
 __decorate([
-    (0, common_1.Get)(),
+    (0, common_1.Get)('all'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], CategoriesController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], CategoriesController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Patch)(':id'),
+    (0, common_1.UseGuards)(authentication_guard_1.AuthenticationGuard, (0, authorization_guard_1.AuthorizeGuard)(user_roles_enum_1.Roles.ADMIN)),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, update_category_dto_1.UpdateCategoryDto]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], CategoriesController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
+    (0, common_1.UseGuards)(authentication_guard_1.AuthenticationGuard, (0, authorization_guard_1.AuthorizeGuard)(user_roles_enum_1.Roles.ADMIN)),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], CategoriesController.prototype, "remove", null);
 exports.CategoriesController = CategoriesController = __decorate([
     (0, common_1.Controller)('categories'),

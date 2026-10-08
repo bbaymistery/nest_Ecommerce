@@ -13,8 +13,8 @@ export class CategoryEntity {
     @Column()
     description: string;
 
-    @Column()
-    is_active: boolean;
+    @Column({ default: true })
+    is_active: boolean = true;
 
     @CreateDateColumn()
     createdAt: Timestamp;
