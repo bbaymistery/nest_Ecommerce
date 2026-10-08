@@ -35,21 +35,22 @@ let ProductsController = class ProductsController {
     findOne(id) {
         return this.productsService.findOne(+id);
     }
-    update(id, updateProductDto) {
-        return this.productsService.update(+id, updateProductDto);
+    async update(id, updateProductDto) {
+        return await this.productsService.update(+id, updateProductDto);
     }
-    remove(id) {
-        return this.productsService.remove(+id);
+    async remove(id) {
+        return await this.productsService.remove(+id);
     }
 };
 exports.ProductsController = ProductsController;
 __decorate([
-    (0, common_1.Post)(),
+    (0, common_1.Post)('create'),
     (0, common_1.UseGuards)(authentication_guard_1.AuthenticationGuard, (0, authorization_guard_1.AuthorizeGuard)(user_roles_enum_1.Roles.ADMIN)),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, current_user_decorator_1.CurrentUser)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_product_dto_1.CreateProductDto, user_entity_1.UserEntity]),
+    __metadata("design:paramtypes", [create_product_dto_1.CreateProductDto,
+        user_entity_1.UserEntity]),
     __metadata("design:returntype", Promise)
 ], ProductsController.prototype, "create", null);
 __decorate([
@@ -67,18 +68,20 @@ __decorate([
 ], ProductsController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Patch)(':id'),
+    (0, common_1.UseGuards)(authentication_guard_1.AuthenticationGuard, (0, authorization_guard_1.AuthorizeGuard)(user_roles_enum_1.Roles.ADMIN)),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, update_product_dto_1.UpdateProductDto]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], ProductsController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
+    (0, common_1.UseGuards)(authentication_guard_1.AuthenticationGuard, (0, authorization_guard_1.AuthorizeGuard)(user_roles_enum_1.Roles.ADMIN)),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], ProductsController.prototype, "remove", null);
 exports.ProductsController = ProductsController = __decorate([
     (0, common_1.Controller)('products'),

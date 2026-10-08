@@ -13,9 +13,12 @@ import { ProductEntity } from './entities/product.entity';
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) { }
 
-  @Post()
+  @Post('create')
   @UseGuards(AuthenticationGuard, AuthorizeGuard(Roles.ADMIN))
-  async create(@Body() createProductDto: CreateProductDto, @CurrentUser() currentUser: UserEntity): Promise<ProductEntity> {
+  async create(
+    @Body() createProductDto: CreateProductDto,
+    @CurrentUser() currentUser: UserEntity
+  ): Promise<ProductEntity> {
     return await this.productsService.create(createProductDto, currentUser);
   }
 
@@ -30,12 +33,14 @@ export class ProductsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
-    return this.productsService.update(+id, updateProductDto);
+  @UseGuards(AuthenticationGuard, AuthorizeGuard(Roles.ADMIN))
+  async update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
+    return await this.productsService.update(+id, updateProductDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.productsService.remove(+id);
+  @UseGuards(AuthenticationGuard, AuthorizeGuard(Roles.ADMIN))
+  async remove(@Param('id') id: string) {
+    return await this.productsService.remove(+id);
   }
 }

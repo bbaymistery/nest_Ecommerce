@@ -7,7 +7,7 @@ export declare class ProductEntity {
     description: string;
     price: number;
     stock: number;
-    image: string[];
+    images: string[];
     createdAt: Timestamp;
     updatedAt: Timestamp;
     addedBy: UserEntity;

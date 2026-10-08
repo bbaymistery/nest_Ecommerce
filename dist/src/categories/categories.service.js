@@ -44,7 +44,7 @@ let CategoriesService = class CategoriesService {
             },
         });
         if (!category) {
-            throw new common_1.NotFoundException(`Kategori (#${id}) bulunamadı.`);
+            throw new common_1.NotFoundException(`Kategori (#${id}) bulunamadıiii.`);
         }
         return category;
     }

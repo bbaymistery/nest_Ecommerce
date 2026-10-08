@@ -25,7 +25,7 @@ export class CreateProductDto {
 
     @IsArray({ message: 'Resimler dizi formatında olmalıdır.' })
     @IsNotEmpty({ message: 'Resimler zorunludur.' })
-    images: [];
+    images: string[];
 
     @IsNumber({}, { message: 'Kategori ID sayı formatında olmalıdır.' })
     @IsNotEmpty({ message: 'Kategori ID zorunludur.' })

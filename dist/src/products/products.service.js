@@ -17,32 +17,54 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const product_entity_1 = require("./entities/product.entity");
 const typeorm_2 = require("typeorm");
+const categories_service_1 = require("../categories/categories.service");
 let ProductsService = class ProductsService {
-    constructor(productRepository, categoryRepository) {
+    constructor(productRepository, categoriesService) {
         this.productRepository = productRepository;
-        this.categoryRepository = categoryRepository;
+        this.categoriesService = categoriesService;
     }
     async create(createProductDto, currentUser) {
-        const category = await this.categoryRepository.findOne({ where: { id: createProductDto.categoryId } });
-        if (!category) {
-            throw new common_1.NotFoundException("Category not found");
-        }
+        const category = await this.categoriesService.findOne(createProductDto.categoryId);
+        console.log({ category });
         const product = this.productRepository.create(createProductDto);
+        console.log({ product });
         product.addedBy = currentUser;
         product.category = category;
         return await this.productRepository.save(product);
     }
     async findAll() {
-        return `This action returns all products`;
+        return await this.productRepository.find({
+            relations: {
+                category: true,
+                addedBy: true,
+            }
+        });
     }
-    findOne(id) {
-        return `This action returns a #${id} product`;
+    async findOne(id) {
+        const product = await this.productRepository.findOne({
+            where: { id },
+            relations: {
+                category: true,
+                addedBy: true,
+            }
+        });
+        if (!product) {
+            throw new common_1.NotFoundException(`Ürün (#${id}) bulunamadı.`);
+        }
+        return product;
     }
-    update(id, updateProductDto) {
-        return `This action updates a #${id} product`;
+    async update(id, updateProductDto) {
+        const product = await this.findOne(id);
+        Object.assign(product, updateProductDto);
+        if (updateProductDto.categoryId) {
+            const category = await this.categoriesService.findOne(updateProductDto.categoryId);
+            product.category = category;
+        }
+        return await this.productRepository.save(product);
     }
-    remove(id) {
-        return `This action removes a #${id} product`;
+    async remove(id) {
+        const product = await this.findOne(id);
+        return await this.productRepository.remove(product);
     }
 };
 exports.ProductsService = ProductsService;
@@ -50,6 +72,6 @@ exports.ProductsService = ProductsService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(product_entity_1.ProductEntity)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
-        typeorm_2.Repository])
+        categories_service_1.CategoriesService])
 ], ProductsService);
 //# sourceMappingURL=products.service.js.map

@@ -40,7 +40,7 @@ export class CategoriesService {
     });
 
     if (!category) {
-      throw new NotFoundException(`Kategori (#${id}) bulunamadı.`);
+      throw new NotFoundException(`Kategori (#${id}) bulunamadıiii.`);
     }
 
     return category;

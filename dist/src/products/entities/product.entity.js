@@ -40,7 +40,7 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)('simple-array'),
     __metadata("design:type", Array)
-], ProductEntity.prototype, "image", void 0);
+], ProductEntity.prototype, "images", void 0);
 __decorate([
     (0, typeorm_1.CreateDateColumn)(),
     __metadata("design:type", bson_typings_js_1.Timestamp)
@@ -58,6 +58,6 @@ __decorate([
     __metadata("design:type", category_entity_1.CategoryEntity)
 ], ProductEntity.prototype, "category", void 0);
 exports.ProductEntity = ProductEntity = __decorate([
-    (0, typeorm_1.Entity)()
+    (0, typeorm_1.Entity)('products')
 ], ProductEntity);
 //# sourceMappingURL=product.entity.js.map
