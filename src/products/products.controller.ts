@@ -22,7 +22,7 @@ export class ProductsController {
     return await this.productsService.create(createProductDto, currentUser);
   }
 
-  @Get()
+  @Get('all')
   findAll() {
     return this.productsService.findAll();
   }
