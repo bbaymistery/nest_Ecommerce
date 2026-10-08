@@ -28,6 +28,13 @@ export class CategoriesService {
       relations: {
         addedBy: true,
       },
+      select: {
+        addedBy: {
+          id: true,
+          name: true,
+          email: true
+        }
+      }
     });
   }
 
@@ -36,7 +43,7 @@ export class CategoriesService {
       where: { id },
       relations: {
         addedBy: true,
-      },
+      }
     });
 
     if (!category) {

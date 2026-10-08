@@ -52,6 +52,17 @@ export class ProductsService {
       relations: {
         category: true,
         addedBy: true,
+      },
+      select: {
+        addedBy: {
+          id: true,
+          name: true,
+          email: true
+        },
+        category: {
+          id: true,
+          title: true
+        }
       }
     });
   }
