@@ -1,5 +1,6 @@
 import { Timestamp } from 'typeorm/driver/mongodb/bson.typings.js';
 import { Roles } from '../../utility/common/user-roles.enum';
+import { CategoryEntity } from 'src/categories/entities/category.entity';
 export declare class UserEntity {
     id: number;
     name: string;
@@ -8,4 +9,5 @@ export declare class UserEntity {
     role: Roles[];
     createdAt: Timestamp;
     updatedAt: Timestamp;
+    categories: CategoryEntity[];
 }

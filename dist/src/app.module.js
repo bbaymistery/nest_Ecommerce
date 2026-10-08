@@ -13,6 +13,7 @@ const typeorm_1 = require("@nestjs/typeorm");
 const data_source_1 = require("../db/data-source");
 const users_module_1 = require("./users/users.module");
 const current_user_middleware_1 = require("./utility/middlewares/current-user.middleware");
+const categories_module_1 = require("./categories/categories.module");
 let AppModule = class AppModule {
     configure(consumer) {
         consumer
@@ -27,6 +28,7 @@ exports.AppModule = AppModule = __decorate([
             config_1.ConfigModule.forRoot({ isGlobal: true, }),
             typeorm_1.TypeOrmModule.forRoot(data_source_1.dataSourceOptions),
             users_module_1.UsersModule,
+            categories_module_1.CategoriesModule,
         ],
         controllers: [],
         providers: [],

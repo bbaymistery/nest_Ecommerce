@@ -1,6 +1,7 @@
 import { Timestamp } from 'typeorm/driver/mongodb/bson.typings.js';
 import { Roles } from '../../utility/common/user-roles.enum';
-import { CreateDateColumn, Column, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { CreateDateColumn, Column, Entity, PrimaryGeneratedColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import { CategoryEntity } from 'src/categories/entities/category.entity';
 
 /**
  * USER ENTITY (Kullanıcı Veritabanı Tablo Şeması)
@@ -49,6 +50,9 @@ export class UserEntity {
   @UpdateDateColumn()
   updatedAt: Timestamp;
 
+
+  @OneToMany(() => CategoryEntity, (category) => category.addedBy)
+  categories: CategoryEntity[];
 }
 
 

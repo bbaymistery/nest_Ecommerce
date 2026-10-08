@@ -1,0 +1,1 @@
+npx @nestjs/cli g resource categories --no-spec

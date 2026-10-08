@@ -9,52 +9,42 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UserEntity = void 0;
-const bson_typings_js_1 = require("typeorm/driver/mongodb/bson.typings.js");
-const user_roles_enum_1 = require("../../utility/common/user-roles.enum");
+exports.CategoryEntity = void 0;
+const user_entity_1 = require("../../users/entities/user.entity");
 const typeorm_1 = require("typeorm");
-const category_entity_1 = require("../../categories/entities/category.entity");
-let UserEntity = class UserEntity {
+const bson_typings_js_1 = require("typeorm/driver/mongodb/bson.typings.js");
+let CategoryEntity = class CategoryEntity {
 };
-exports.UserEntity = UserEntity;
+exports.CategoryEntity = CategoryEntity;
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)
-], UserEntity.prototype, "id", void 0);
+], CategoryEntity.prototype, "id", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
-], UserEntity.prototype, "name", void 0);
+], CategoryEntity.prototype, "title", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ unique: true }),
+    (0, typeorm_1.Column)(),
     __metadata("design:type", String)
-], UserEntity.prototype, "email", void 0);
+], CategoryEntity.prototype, "description", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ select: false }),
-    __metadata("design:type", String)
-], UserEntity.prototype, "password", void 0);
-__decorate([
-    (0, typeorm_1.Column)({
-        type: 'enum',
-        enum: user_roles_enum_1.Roles,
-        array: true,
-        default: [user_roles_enum_1.Roles.USER],
-    }),
-    __metadata("design:type", Array)
-], UserEntity.prototype, "role", void 0);
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", Boolean)
+], CategoryEntity.prototype, "is_active", void 0);
 __decorate([
     (0, typeorm_1.CreateDateColumn)(),
     __metadata("design:type", bson_typings_js_1.Timestamp)
-], UserEntity.prototype, "createdAt", void 0);
+], CategoryEntity.prototype, "createdAt", void 0);
 __decorate([
     (0, typeorm_1.UpdateDateColumn)(),
     __metadata("design:type", bson_typings_js_1.Timestamp)
-], UserEntity.prototype, "updatedAt", void 0);
+], CategoryEntity.prototype, "updatedAt", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => category_entity_1.CategoryEntity, (category) => category.addedBy),
-    __metadata("design:type", Array)
-], UserEntity.prototype, "categories", void 0);
-exports.UserEntity = UserEntity = __decorate([
-    (0, typeorm_1.Entity)('users')
-], UserEntity);
-//# sourceMappingURL=user.entity.js.map
+    (0, typeorm_1.ManyToOne)(() => user_entity_1.UserEntity, (user) => user.categories),
+    __metadata("design:type", user_entity_1.UserEntity)
+], CategoryEntity.prototype, "addedBy", void 0);
+exports.CategoryEntity = CategoryEntity = __decorate([
+    (0, typeorm_1.Entity)('categories')
+], CategoryEntity);
+//# sourceMappingURL=category.entity.js.map
