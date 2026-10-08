@@ -1,6 +1,7 @@
 import { CategoryEntity } from "src/categories/entities/category.entity";
+import { ReviewEntity } from "src/reviews/entities/review.entity";
 import { UserEntity } from "src/users/entities/user.entity";
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany } from "typeorm";
 
 @Entity('products')
 export class ProductEntity {
@@ -27,7 +28,15 @@ export class ProductEntity {
 
     @UpdateDateColumn()
     updatedAt: Date;
-
+    /*
+    Instagram Gönderisi ve Yorumlar:
+    
+    (@OneToMany).
+    Instagram Postu (Product): Bir postun altında BİNLERCE yorum olabilir 
+    
+    (@ManyToOne).
+    Atılan Yorum (Review): O yorum SADECE 1 TANE postun altındadır 
+    */
     // Çoktan-Bir'e İlişki: Bir kullanıcının (Admin) birden fazla eklediği ürün olabilir
     @ManyToOne(() => UserEntity, (user) => user.products)
     addedBy: UserEntity;
@@ -35,4 +44,7 @@ export class ProductEntity {
     // Çoktan-Bir'e İlişki: Bir ürünün sadece tek bir kategorisi olabilir
     @ManyToOne(() => CategoryEntity, (category) => category.products)
     category: CategoryEntity;
+
+    @OneToMany(() => ReviewEntity, (review) => review.product)
+    reviews: ReviewEntity[];
 }

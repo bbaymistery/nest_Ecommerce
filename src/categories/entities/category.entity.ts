@@ -21,6 +21,15 @@ export class CategoryEntity {
 
     @UpdateDateColumn()
     updatedAt: Date;
+    /*
+  Instagram Gönderisi ve Yorumlar:
+  
+  (@OneToMany).
+  Instagram Postu (Product): Bir postun altında BİNLERCE yorum olabilir 
+  
+  (@ManyToOne).
+  Atılan Yorum (Review): O yorum SADECE 1 TANE postun altındadır 
+  */
 
     // user can create many categories
     @ManyToOne(() => UserEntity, (user) => user.categories)

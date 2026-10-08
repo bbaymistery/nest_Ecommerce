@@ -2,6 +2,7 @@ import { Roles } from '../../utility/common/user-roles.enum';
 import { CreateDateColumn, Column, Entity, PrimaryGeneratedColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 import { CategoryEntity } from 'src/categories/entities/category.entity';
 import { ProductEntity } from 'src/products/entities/product.entity';
+import { ReviewEntity } from 'src/reviews/entities/review.entity';
 
 /**
  * USER ENTITY (Kullanıcı Veritabanı Tablo Şeması)
@@ -41,4 +42,8 @@ export class UserEntity {
 
   @OneToMany(() => ProductEntity, (product) => product.addedBy)
   products: ProductEntity[];
+
+  //it means one user can write many reviews
+  @OneToMany(() => ReviewEntity, (review) => review.user)
+  reviews: ReviewEntity[];
 }
