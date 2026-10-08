@@ -2,6 +2,7 @@ import { Timestamp } from 'typeorm/driver/mongodb/bson.typings.js';
 import { Roles } from '../../utility/common/user-roles.enum';
 import { CreateDateColumn, Column, Entity, PrimaryGeneratedColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 import { CategoryEntity } from 'src/categories/entities/category.entity';
+import { ProductEntity } from 'src/products/entities/product.entity';
 
 /**
  * USER ENTITY (Kullanıcı Veritabanı Tablo Şeması)
@@ -50,9 +51,13 @@ export class UserEntity {
   @UpdateDateColumn()
   updatedAt: Timestamp;
 
-
+  //I means a user can have multiple categories
   @OneToMany(() => CategoryEntity, (category) => category.addedBy)
   categories: CategoryEntity[];
+
+  //it means  a user can have multiple products
+  @OneToMany(() => ProductEntity, (product) => product.addedBy)
+  products: ProductEntity[];
 }
 
 

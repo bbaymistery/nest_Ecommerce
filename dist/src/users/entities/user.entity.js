@@ -14,6 +14,7 @@ const bson_typings_js_1 = require("typeorm/driver/mongodb/bson.typings.js");
 const user_roles_enum_1 = require("../../utility/common/user-roles.enum");
 const typeorm_1 = require("typeorm");
 const category_entity_1 = require("../../categories/entities/category.entity");
+const product_entity_1 = require("../../products/entities/product.entity");
 let UserEntity = class UserEntity {
 };
 exports.UserEntity = UserEntity;
@@ -54,6 +55,10 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => category_entity_1.CategoryEntity, (category) => category.addedBy),
     __metadata("design:type", Array)
 ], UserEntity.prototype, "categories", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => product_entity_1.ProductEntity, (product) => product.addedBy),
+    __metadata("design:type", Array)
+], UserEntity.prototype, "products", void 0);
 exports.UserEntity = UserEntity = __decorate([
     (0, typeorm_1.Entity)('users')
 ], UserEntity);
