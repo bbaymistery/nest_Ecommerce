@@ -9,6 +9,8 @@ import { UsersService } from 'src/users/users.service';
  * Express Request arabirimine 'currentUser' özelliğini ekliyoruz.
  * Böylece req.currentUser diyerek oturum açan kullanıcıya her yerden erişebiliriz.
  */
+//normalda rq.user yazardik budefe req.currentuzerin calismasi icin
+//asagidakilari yazdik
 declare global {
   namespace Express {
     interface Request {
