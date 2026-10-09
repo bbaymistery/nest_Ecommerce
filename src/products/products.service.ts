@@ -37,7 +37,6 @@ export class ProductsService {
 
     // Ürün nesnesini DTO ile oluşturuyoruz
     const product = this.productRepository.create(createProductDto);
-    console.log({ product });
 
     // İlişkileri kuruyoruz
     product.addedBy = currentUser;
@@ -52,6 +51,8 @@ export class ProductsService {
       relations: {
         category: true,
         addedBy: true,
+        reviews: true
+
       },
       select: {
         addedBy: {
@@ -62,7 +63,7 @@ export class ProductsService {
         category: {
           id: true,
           title: true
-        }
+        },
       }
     });
   }
@@ -73,7 +74,19 @@ export class ProductsService {
       relations: {
         category: true,
         addedBy: true,
-      }
+      },
+      select: {
+        category: {
+          id: true,
+          title: true,
+          description: true, // 👈 Sadece istedikleriniz çekilir
+        },
+        addedBy: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
     });
 
     if (!product) {

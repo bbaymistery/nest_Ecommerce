@@ -36,4 +36,3 @@ export class ReviewEntity {
     @ManyToOne(() => ProductEntity, (product) => product.reviews)
     product: ProductEntity;
 }
-
