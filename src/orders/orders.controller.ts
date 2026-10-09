@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
@@ -26,6 +26,19 @@ export class OrdersController {
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return await this.ordersService.findOne(+id);
+  }
+
+  /**
+   * SİPARİŞ İPTAL ETME (Put /orders/cancel/:id)
+   * Admin yetkilisi siparişi iptal eder (CANCELLED) ve ürün stoklarını iade eder.
+   */
+  @Put('cancel/:id')
+  @UseGuards(AuthenticationGuard, AuthorizeGuard(Roles.ADMIN))
+  async cancelled(
+    @Param('id') id: string,
+    @CurrentUser() currentUser: UserEntity
+  ) {
+    return await this.ordersService.cancelled(+id, currentUser);
   }
 
   /**

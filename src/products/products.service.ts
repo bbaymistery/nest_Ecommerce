@@ -116,4 +116,23 @@ export class ProductsService {
     const product = await this.findOne(id);
     return await this.productRepository.remove(product);
   }
+
+  /**
+   * ÜRÜN STOK GÜNCELLEME (Stock Update)
+   * 
+   * @param id Ürün ID'si
+   * @param stockQuantity Sipariş edilen/iptal edilen adet
+   * @param status Sipariş durumu (DELIVERED ise stok düşer, CANCELLED ise stok geri iade edilir)
+   */
+  async updateStock(id: number, stockQuantity: number, status: string) {
+    const product = await this.findOne(id);
+
+    if (status === 'delivered') {
+      product.stock -= stockQuantity; // Teslim edildiğinde stoktan düşürülür
+    } else {
+      product.stock += stockQuantity; // İptal edildiğinde stok geri iade edilir
+    }
+
+    return await this.productRepository.save(product);
+  }
 }

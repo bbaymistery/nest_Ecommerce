@@ -9,6 +9,7 @@ import { OrdersProductsEntity } from './entities/orders-products.entity';
 import { ShippingEntity } from './entities/shipping.entity';
 import { ProductEntity } from 'src/products/entities/product.entity';
 import { OrderStatus } from './enums/oder-status.enum';
+import { ProductsService } from 'src/products/products.service';
 
 @Injectable()
 export class OrdersService {
@@ -19,48 +20,28 @@ export class OrdersService {
 
     // OrdersProducts (Sipariş Kalemleri / Ara Tablo) için repository
     @InjectRepository(OrdersProductsEntity)
-    private readonly opRepository: Repository<OrdersProductsEntity>
+    private readonly opRepository: Repository<OrdersProductsEntity>,
+
+    // Ürünlerin stok durumlarını güncellemek için ProductsService
+    private readonly productsService: ProductsService,
   ) { }
 
   /**
    * ADIM ADIM SİPARİŞ OLUŞTURMA İŞLEMİ (Create Order)
-   * 
-   * 1. ADIM: Kargo adresi nesnesi oluştur (new ShippingEntity).
-   *    DTO'dan gelen adres verilerini (phone, city, address vs.) kargo nesnesine kopyala.
-   * 
-   * 2. ADIM: Sipariş nesnesi oluştur (new OrderEntity).
-   *    Kargo adresini (shippingAddress) ve siparişi veren kullanıcıyı (user) siparişe bağla.
-   * 
-   * 3. ADIM: Siparişi kaydediyoruz (orderRepository.save).
-   *    cascade: true olduğu için TypeORM kargo adresini de otomatik shippings tablosuna kaydeder
-   *    ve bize veritabanında oluşan Sipariş nesnesini (order.id içeren UUID) döndürür.
-   * 
-   * 4. ADIM: DTO ile gelen ürün listesini (orderedProducts) tek tek geziyoruz (for döngüsü).
-   *    Her bir ürün için ara tabloya (orders_products) yazılacak nesneleri hazırlıyoruz:
-   *    - Hangi sipariş? (orderId: order.id)
-   *    - Hangi ürün? (productId)
-   *    - Kaç adet? (product_quantity)
-   *    - Birim fiyatı ne kadar? (product_unit_price)
-   * 
-   * 5. ADIM: Hazırlanan tüm ürün kalemlerini createQueryBuilder ile topluca ara tabloya kaydediyoruz.
-   * 
-   * 6. ADIM: Oluşturulan siparişi tüm ilişkileriyle (Kargo adresi, Kullanıcı, Ürünler) 
-   *    birlikte ekrana döküyoruz (findOne).
    */
   async create(createOrderDto: CreateOrderDto, currentUser: UserEntity) {
 
     // 1. Kargo Adresi Nesnesini Oluşturuyoruz
     const shippingEntity = new ShippingEntity();
-    // DTO'dan gelen verileri (name, phone, address, city...) kargo nesnesine aktarıyoruz
     Object.assign(shippingEntity, createOrderDto.shippingAddress);
 
     // 2. Sipariş Nesnesini Oluşturuyoruz
     const orderEntity = this.orderRepository.create({
-      shippingAddress: shippingEntity,// Kargo adresini bağlıyoruz
-      user: currentUser,    // Siparişi veren kullanıcıyı bağlıyoruz
+      shippingAddress: shippingEntity,
+      user: currentUser,
     });
 
-    // 3. Siparişi Veritabanına Kaydediyoruz (Sipariş kaydedilince id/UUID oluşur)
+    // 3. Siparişi Veritabanına Kaydediyoruz
     const order = await this.orderRepository.save(orderEntity);
 
     // 4. Ara Tablo (orders_products) İçin Nesne Dizisi Hazırlıyoruz
@@ -74,7 +55,7 @@ export class OrdersService {
       } as OrdersProductsEntity);
     }
 
-    // 5. Ara Tabloya (orders_products) Toplu Ekleme Yapıyoruz (Bulk Insert)
+    // 5. Ara Tabloya (orders_products) Toplu Ekleme Yapıyoruz
     await this.opRepository.createQueryBuilder()
       .insert()
       .into(OrdersProductsEntity)
@@ -117,44 +98,79 @@ export class OrdersService {
   }
 
   /**
-   * SİPARİŞ DURUMU GÜNCELLEME (Update Order Status)
+   * STOK GÜNCELLEME YARDIMCI METODU (Stock Update Helper)
    * 
-   * @param id Sipariş ID'si
-   * @param updateOrderDto Yeni durum bilgisi (SHIPPED, DELIVERED, CANCELLED vs.)
-   * @param currentUser Durumu güncelleyen yetkili (Admin)
+   * Sipariş içerisindeki tüm ürünleri tek tek gezip ürünlerin veritabanındaki 
+   * stok miktarlarını duruma göre (DELIVERED / CANCELLED) günceller.
+   */
+  async stockUpdate(order: OrderEntity, status: string) {
+    for (const op of order.products) {
+      await this.productsService.updateStock(
+        op.product.id,
+        op.product_quantity,
+        status,
+      );
+    }
+  }
+
+  /**
+   * SİPARİŞ DURUMU GÜNCELLEME (Update Order Status)
    */
   async update(id: number, updateOrderDto: UpdateOrderDto, currentUser: UserEntity) {
-    // 1. Sipariş var mı kontrol et (yoksa 404 NotFoundException fırlatır)
-    const order = await this.findOne(id);
+    let order = await this.findOne(id);
 
-    // 2. Eğer sipariş kargolandıysa (SHIPPED) kargolanma tarihini güncelle
     if (updateOrderDto.status === OrderStatus.SHIPPED && !order.shippedAt) {
       order.shippedAt = new Date();
     }
 
-    // 3. Eğer sipariş teslim edildiyse (DELIVERED) teslim edilme tarihini güncelle
     if (updateOrderDto.status === OrderStatus.DELIVERED && !order.deliveredAt) {
       order.deliveredAt = new Date();
     }
 
-    // 4. Siparişin yeni durumunu ve güncelleyen Admin bilgisini bağla
     order.status = updateOrderDto.status;
     order.updatedBy = currentUser;
+    order = await this.orderRepository.save(order);
 
-    // 5. Veritabanına kaydet
-    return await this.orderRepository.save(order);
+    // Eğer sipariş teslim edildiyse (DELIVERED), stok miktarlarını düşür
+    if (updateOrderDto.status === OrderStatus.DELIVERED) {
+      await this.stockUpdate(order, OrderStatus.DELIVERED);
+    }
+
+    return order;
+  }
+
+  /**
+   * SİPARİŞİ İPTAL ETME (Cancel Order)
+   * 
+   * Siparişi CANCELLED durumuna getirir ve ürün stoklarını iade eder (stokları arttırır).
+   */
+  async cancelled(id: number, currentUser: UserEntity) {
+    let order = await this.findOne(id);
+
+    if (!order) {
+      throw new NotFoundException('Order Not Found.');
+    }
+
+    // Eğer sipariş zaten iptal edilmişse aynı işlemi tekrar yapma
+    if (order.status === OrderStatus.CANCELLED) {
+      return order;
+    }
+
+    order.status = OrderStatus.CANCELLED;
+    order.updatedBy = currentUser;
+    order = await this.orderRepository.save(order);
+
+    // İptal edildiği için ürün stoklarını veritabanında geri arttırıyoruz (iade ediyoruz)
+    await this.stockUpdate(order, OrderStatus.CANCELLED);
+
+    return order;
   }
 
   /**
    * SİPARİŞİ VERİTABANINDAN (NEON DB) SİLME (Delete Order)
-   * 
-   * @param id Silinecek Sipariş ID'si
    */
   async remove(id: number) {
-    // 1. Siparişi bul (yoksa 404 atar)
     const order = await this.findOne(id);
-
-    // 2. Neon DB'den fiziki olarak tamamen silmek için .remove() kullanıyoruz
     return await this.orderRepository.remove(order);
   }
 }
