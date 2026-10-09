@@ -1,7 +1,8 @@
-import { Entity, Column, CreateDateColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn, OneToOne, JoinColumn } from "typeorm";
+import { Entity, Column, CreateDateColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn, OneToOne, JoinColumn, OneToMany } from "typeorm";
 import { OrderStatus } from "../enums/oder-status.enum";
 import { UserEntity } from "src/users/entities/user.entity";
 import { ShippingEntity } from "./shipping.entity";
+import { OrdersProductsEntity } from "./orders-products.entity";
 
 /**
  * ORDER ENTITY (Sipariş Veritabanı Tablosu)
@@ -11,8 +12,8 @@ import { ShippingEntity } from "./shipping.entity";
 @Entity('orders')
 export class OrderEntity {
 
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @CreateDateColumn()
   orderAt: Date;
@@ -29,7 +30,8 @@ export class OrderEntity {
   /*
     (@ManyToOne - Çoktan Bire İlişki)
     Siparişi Güncelleyen Yetkili (Admin):
-    - 1 Admin / Yetkili Kullanıcı BİNLERCE siparişin durumunu güncelleyebilir (Kargolandı, Teslim Edildi vs.)
+    - 1 Admin / Yetkili Kullanıcı BİNLERCE siparişin durumunu güncelleyebilir 
+    (Kargolandı, Teslim Edildi vs.)
     - Ama 1 Siparişteki o güncellemeyi SADECE 1 Yetkili yapmıştır.
   */
   @ManyToOne(() => UserEntity, (user) => user.ordersUpdatedBy)
@@ -42,7 +44,8 @@ export class OrderEntity {
     - 1 Kargo adresi kaydı da SADECE 1 Siparişe aittir.
 
     cascade: true nedir?
-    Siparişi kaydederken (orderRepository.save) kargo adresini de içine nesne olarak koyarsak,
+    Siparişi kaydederken (orderRepository.save) 
+     kargo adresini de içine nesne olarak koyarsak,
     TypeORM otomatik olarak kargo adresini de shippings tablosuna kaydeder.
     Ekstra shippingRepository.save() yapmamıza gerek kalmaz.
 
@@ -54,5 +57,20 @@ export class OrderEntity {
   @OneToOne(() => ShippingEntity, (shipping) => shipping.order, { cascade: true })
   @JoinColumn()
   shippingAddress: ShippingEntity;
+
+
+  /*
+    (@OneToMany - Birden Çoka İlişki)
+    Sipariş Kalemleri (OrdersProducts):
+    - 1 Siparişin altında BİNLERCE sipariş kalemi (ürün satırı) bulunabilir.
+    - cascade: true sayesinde siparişi kaydederken
+      içindeki tüm ürün kalemleri de otomatik kaydedilir.
+  */
+  @OneToMany(() => OrdersProductsEntity, (op) => op.order, { cascade: true })
+  products: OrdersProductsEntity[];
+
+
+  @ManyToOne(() => UserEntity, (user) => user.orders)
+  user: UserEntity;
 
 }

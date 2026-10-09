@@ -1,4 +1,5 @@
 import { CategoryEntity } from "src/categories/entities/category.entity";
+import { OrdersProductsEntity } from "src/orders/entities/orders-products.entity";
 import { ReviewEntity } from "src/reviews/entities/review.entity";
 import { UserEntity } from "src/users/entities/user.entity";
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany } from "typeorm";
@@ -45,6 +46,10 @@ export class ProductEntity {
     @ManyToOne(() => CategoryEntity, (category) => category.products)
     category: CategoryEntity;
 
+    // it means one product can have many reviews
     @OneToMany(() => ReviewEntity, (review) => review.product)
     reviews: ReviewEntity[];
+    // Çoktan-Çoka Ara İlişkisi: 1 Ürün birden fazla sipariş kaleminde (OrdersProducts) yer alabilir
+    @OneToMany(() => OrdersProductsEntity, (op) => op.product)
+    products: OrdersProductsEntity[];
 }

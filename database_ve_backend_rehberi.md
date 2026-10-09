@@ -12,8 +12,6 @@ Kafanın karışmasının sebebi, farklı kategorideki araçların aynı çuvala
 ┌────────────────────────────────────────────────────────────────────────┐
 │                        SENİN UYGULAMAN (Frontend / Mobile)             │
 └──────────────────────────────────┬─────────────────────────────────────┘
-                                   │
-       ┌───────────────────────────┴───────────────────────────┐
        ▼                                                       ▼
 ┌──────────────────────────────────────┐     ┌──────────────────────────────────┐
 │  A) Kendi Backend'ini Yazıyorsan     │     │  B) Hazır Backend Kullanıyorsan  │
@@ -111,15 +109,15 @@ Kafanın karışmasının sebebi, farklı kategorideki araçların aynı çuvala
 
 ## 📊 4. Özet Karşılaştırma Tablosu
 
-| Araç | Kategorisi | Veritabanı mı? | SQL mi NoSQL mi? | Hangi Katmanda Çalışır? |
-| :--- | :--- | :--- | :--- | :--- |
-| **PostgreSQL** | Veritabanı | **EVET** | SQL (İlişkisel) | Veri Saklama Katmanı |
-| **MongoDB** | Veritabanı | **EVET** | NoSQL (Doküman) | Veri Saklama Katmanı |
-| **Neon DB** | Serverless DB | **EVET** | SQL (PostgreSQL) | Bulut Veri Saklama |
-| **Supabase** | BaaS (Tüm Altyapı) | **İçinde var** | SQL (PostgreSQL) | Full Backend (DB+Auth+Storage) |
-| **Firebase** | BaaS (Tüm Altyapı) | **İçinde var** | NoSQL (Firestore) | Full Backend (DB+Auth+Storage) |
-| **Prisma** | ORM Kütüphanesi | **HAYIR** | İkisini de bağlar | Node.js / NestJS Kodu İçi |
-| **TypeORM** | ORM Kütüphanesi | **HAYIR** | SQL Bağlar | Node.js / NestJS Kodu İçi |
+| Araç           | Kategorisi         | Veritabanı mı? | SQL mi NoSQL mi?  | Hangi Katmanda Çalışır?        |
+| :------------- | :----------------- | :------------- | :---------------- | :----------------------------- |
+| **PostgreSQL** | Veritabanı         | **EVET**       | SQL (İlişkisel)   | Veri Saklama Katmanı           |
+| **MongoDB**    | Veritabanı         | **EVET**       | NoSQL (Doküman)   | Veri Saklama Katmanı           |
+| **Neon DB**    | Serverless DB      | **EVET**       | SQL (PostgreSQL)  | Bulut Veri Saklama             |
+| **Supabase**   | BaaS (Tüm Altyapı) | **İçinde var** | SQL (PostgreSQL)  | Full Backend (DB+Auth+Storage) |
+| **Firebase**   | BaaS (Tüm Altyapı) | **İçinde var** | NoSQL (Firestore) | Full Backend (DB+Auth+Storage) |
+| **Prisma**     | ORM Kütüphanesi    | **HAYIR**      | İkisini de bağlar | Node.js / NestJS Kodu İçi      |
+| **TypeORM**    | ORM Kütüphanesi    | **HAYIR**      | SQL Bağlar        | Node.js / NestJS Kodu İçi      |
 
 ---
 

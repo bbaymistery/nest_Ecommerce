@@ -1,5 +1,5 @@
 import { Roles } from '../../utility/common/user-roles.enum';
-import { CreateDateColumn, Column, Entity, PrimaryGeneratedColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import { CreateDateColumn, Column, Entity, PrimaryGeneratedColumn, UpdateDateColumn, OneToMany, ManyToOne } from 'typeorm';
 import { CategoryEntity } from 'src/categories/entities/category.entity';
 import { ProductEntity } from 'src/products/entities/product.entity';
 import { ReviewEntity } from 'src/reviews/entities/review.entity';
@@ -37,10 +37,11 @@ export class UserEntity {
 
   @UpdateDateColumn()
   updatedAt: Date;
-
+  // it means one user can add many categories 
   @OneToMany(() => CategoryEntity, (category) => category.addedBy)
   categories: CategoryEntity[];
 
+  //it means one user can add many products
   @OneToMany(() => ProductEntity, (product) => product.addedBy)
   products: ProductEntity[];
 
@@ -51,4 +52,8 @@ export class UserEntity {
   // Bir yetkili (Admin) birden fazla siparişin durumunu güncelleyebilir
   @OneToMany(() => OrderEntity, (order) => order.updatedBy)
   ordersUpdatedBy: OrderEntity[];
+
+
+  @OneToMany(() => OrderEntity, (order) => order.user)
+  orders: OrderEntity[];
 }

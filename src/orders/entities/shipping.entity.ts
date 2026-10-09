@@ -8,8 +8,11 @@ import { OrderEntity } from "./order.entity";
  */
 @Entity('shippings')
 export class ShippingEntity {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column({ nullable: true })
+  phone: string;
 
   @Column()
   shippingCompany: string;
