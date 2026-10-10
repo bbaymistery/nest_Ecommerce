@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { OrdersController } from './orders.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -9,15 +9,18 @@ import { ProductsModule } from 'src/products/products.module';
 
 @Module({
   imports: [
-    // Here we define the entities that this module will use
-    // in the orders module we will use orders, orders_products and shipping entities
     TypeOrmModule.forFeature([
       OrderEntity,
       OrdersProductsEntity,
       ShippingEntity
-    ]), ProductsModule
+    ]),
+    // forwardRef(() => OrdersModule) yazarak NestJS'e şu talimat verilir:
+
+    // "Acele etme! Önce her iki modülü de başlat. İkisi de yüklendikten sonra bağımlılıklarını birbirine sonradan enjekte et (forward et)."
+    forwardRef(() => ProductsModule)
   ],
   controllers: [OrdersController],
   providers: [OrdersService],
+  exports: [OrdersService]
 })
 export class OrdersModule { }

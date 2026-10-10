@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { UserEntity } from 'src/users/entities/user.entity';
@@ -22,7 +22,8 @@ export class OrdersService {
     @InjectRepository(OrdersProductsEntity)
     private readonly opRepository: Repository<OrdersProductsEntity>,
 
-    // Ürünlerin stok durumlarını güncellemek için ProductsService
+    // Ürünlerin stok durumlarını güncellemek için ProductsService (Circular Dependency çözümü için forwardRef)
+    @Inject(forwardRef(() => ProductsService))
     private readonly productsService: ProductsService,
   ) { }
 
@@ -113,6 +114,20 @@ export class OrdersService {
     }
   }
 
+  /**
+   * Bir ürünün siparişlerde kullanılıp kullanılmadığını kontrol eden metod.
+   * opRepository (OrdersProducts tablosu) üzerinden bu ürünün siparişi var mı diye bakar.
+   */
+  async findOneByProductId(productId: number) {
+    return await this.opRepository.findOne({
+      relations: { product: true },
+      where: {
+        product: {
+          id: productId,
+        },
+      },
+    });
+  }
   /**
    * SİPARİŞ DURUMU GÜNCELLEME (Update Order Status)
    */

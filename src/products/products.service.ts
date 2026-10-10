@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -8,6 +8,7 @@ import { CategoriesService } from 'src/categories/categories.service';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { FilterProductDto } from './dto/filter-product.dto';
 import { ProductDto } from './dto/products.dto';
+import { OrdersService } from 'src/orders/orders.service';
 
 @Injectable()
 export class ProductsService {
@@ -20,6 +21,10 @@ export class ProductsService {
     // 2. Kategori işlemleri için CategoriesModule tarafından
     //  dışa aktarılan CategoriesService'i alıyoruz
     private readonly categoriesService: CategoriesService,
+
+    // 3. Sipariş işlemleri için OrdersModule tarafından (Circular Dependency çözümü için forwardRef)
+    @Inject(forwardRef(() => OrdersService))
+    private readonly ordersService: OrdersService
   ) { }
 
   /**
@@ -189,10 +194,27 @@ export class ProductsService {
     return await this.productRepository.save(product);
   }
 
+  /**
+   * ÜRÜN SİLME (Delete Product)
+   * 
+   * İş Kuralı:
+   * Bir ürünü silmeden önce bu ürünün daha önceden verilmiş herhangi bir siparişte (Order) 
+   * yer alıp almadığını kontrol ediyoruz. Eğer ürün siparişlerde varsa veritabanından 
+   * silinmesine izin verilmez (400 BadRequestException atılır).
+   */
   async remove(id: number): Promise<ProductEntity> {
     const product = await this.findOne(id);
+
+    // 1. Bu ürün daha önce herhangi bir siparişte yer almış mı kontrol et:
+    const order = await this.ordersService.findOneByProductId(product.id);
+
+    // 2. Eğer siparişte geçmişi varsa veritabanından silinmesine izin VERME (Hata fırlat):
+    if (order) throw new BadRequestException("Product is in use");
+
+    // 3. Siparişi yoksa güvenle sil:
     return await this.productRepository.remove(product);
   }
+
 
   /**
    * ÜRÜN STOK GÜNCELLEME (Stock Update)
