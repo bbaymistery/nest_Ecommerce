@@ -6,6 +6,7 @@ import { ProductEntity } from './entities/product.entity';
 import { Repository } from 'typeorm';
 import { CategoriesService } from 'src/categories/categories.service';
 import { UserEntity } from 'src/users/entities/user.entity';
+import { FilterProductDto } from './dto/filter-product.dto';
 
 @Injectable()
 export class ProductsService {
@@ -46,26 +47,93 @@ export class ProductsService {
     return await this.productRepository.save(product);
   }
 
-  async findAll(): Promise<ProductEntity[]> {
-    return await this.productRepository.find({
-      relations: {
-        category: true,
-        addedBy: true,
-        reviews: true
+  async findAll(query: FilterProductDto): Promise<any> {
+    let filteredTotalProducts: number;
+    let limit = query.limit ? query.limit : 4;
 
-      },
-      select: {
-        addedBy: {
-          id: true,
-          name: true,
-          email: true
-        },
-        category: {
-          id: true,
-          title: true
-        },
-      }
-    });
+    // 2. TypeORM QueryBuilder Başlatma:
+    // ProductEntity tablosu üzerinde 'products' takma adıyla (alias) 
+    // bir SQL sorgusu inşa etmeye başlıyoruz.
+    const queryBuilder = this.productRepository
+      .createQueryBuilder('products')
+
+      // 3. Ürünlerin Kategorisini Sorguya Dahil Etme:
+      // Her ürünün bağlı olduğu kategoriyi (category tablosunu) LEFT JOIN ile birleştiriyoruz 
+      // ve koda category verisinin çekilmesini sağlıyoruz.
+      .leftJoinAndSelect('products.category', 'category')
+
+      // 4. Ürün Yorumlarını (Reviews) Sorguya Dahil Etme:
+      // DİKKAT: Buradaki `leftJoinAndSelect` kullanımı terminaldeki hataya sebep oldu (Aşağıda 3. maddede detaylandırıldı).
+      // Yorumların puan ortalamasını ve sayısını hesaplamak için review tablosunu birleştiriyoruz.
+      .leftJoin('products.reviews', 'review')
+
+      // 5. Özel SQL Hesaplama Alanları (Aggregations) Ekleme:
+      // - COUNT(review.id): Ürüne kaç tane yorum yapıldığını sayar -> reviewCount olarak döner.
+      // - AVG(review.ratings): Yorumların yıldız/puan ortalamasını alır -> avgRating olarak döner.
+      .addSelect([
+        'COUNT(review.id) AS reviewCount',
+        'AVG(review.ratings)::numeric(10,2) AS avgRating',
+      ])
+
+      // 6. Gruplama (GROUP BY):
+      // AVG ve COUNT gibi toplu (aggregate) fonksiyonlar kullanıldığı için SQL standartları gereği
+      // sonuçların hangi alanlara göre gruplanacağını belirtiyoruz (Ürün ID'si ve Kategori ID'sine göre).
+      .groupBy('products.id,category.id');
+
+    // Filtre uygulanmadan önceki toplam ürün sayısını alır.
+    const totalProducts = await queryBuilder.getCount();
+
+    // 7. Arama Filtresi (Title SEARCH):
+    // Eğer query içinde 'search' geldiyse, başlığında aranan kelime geçen ürünleri filtreler (%kelime%).
+    if (query.search) {
+      const search = query.search;
+      queryBuilder.andWhere('products.title like :title', { title: `%${search}%` });
+    }
+
+    // 8. Kategori Filtresi:
+    // Eğer belirli bir kategori ID'si gönderildiyse sadece o kategoriye ait ürünleri süzeler.
+    if (query.category) {
+      queryBuilder.andWhere('category.id=:id', { id: query.category });
+    }
+
+    // 9. Minimum Fiyat Filtresi:
+    // Fiyatı belirtilen tutardan büyük veya eşit olanları süzeler.
+    if (query.minPrice) {
+      queryBuilder.andWhere('products.price>=:minPrice', { minPrice: query.minPrice });
+    }
+
+    // 10. Maksimum Fiyat Filtresi:
+    // Fiyatı belirtilen tutardan küçük veya eşit olanları süzeler.
+    if (query.maxPrice) {
+      queryBuilder.andWhere('products.price<=:maxPrice', { maxPrice: query.maxPrice });
+    }
+
+    // 11. Minimum Ortalama Puan Filtresi (HAVING):
+    // DİKKAT: AVG() gibi hesaplanmış (aggregate) alanlar WHERE ile filtrelenmez! 
+    // SQL kuralı gereği GROUP BY işleminden sonra HAVING ile filtrelenir.
+    if (query.minRating) {
+      queryBuilder.andHaving('AVG(review.ratings)>=:minRating', { minRating: query.minRating });
+    }
+
+    // 12. Maksimum Ortalama Puan Filtresi:
+    if (query.maxRating) {
+      queryBuilder.andHaving('AVG(review.ratings)<=:maxRating', { maxRating: query.maxRating });
+    }
+
+    // 13. Sayfalama (Pagination - Limit & Offset):
+    // Getirilecek maksimum kayıt sayısı
+    queryBuilder.limit(limit);
+
+    // Kaçıncı kayıttan başlanacağı (Örn: 2. sayfa için offset: 4)
+    if (query.offset) {
+      queryBuilder.offset(query.offset);
+    }
+
+    // 14. Sonuçları Ham (Raw) Format Olarak Alma:
+    // getMany() standart entity nesnesi döndürürken; getRawMany() `addSelect` ile eklediğimiz
+    // `reviewCount` ve `avgRating` gibi hesaplanmış ham SQL alanlarını da içeren verileri döner.
+    const products = await queryBuilder.getRawMany();
+    return products;
   }
 
   async findOne(id: number): Promise<ProductEntity> {
