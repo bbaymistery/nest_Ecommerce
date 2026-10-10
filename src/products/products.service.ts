@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { CategoriesService } from 'src/categories/categories.service';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { FilterProductDto } from './dto/filter-product.dto';
+import { ProductDto } from './dto/products.dto';
 
 @Injectable()
 export class ProductsService {
@@ -47,7 +48,11 @@ export class ProductsService {
     return await this.productRepository.save(product);
   }
 
-  async findAll(query: FilterProductDto): Promise<any> {
+  async findAll(query: FilterProductDto): Promise<{
+    products: ProductDto[],
+    totalProducts: number,
+    limit: number
+  }> {
     let filteredTotalProducts: number;
     let limit = query.limit ? query.limit : 4;
 
@@ -133,7 +138,11 @@ export class ProductsService {
     // getMany() standart entity nesnesi döndürürken; getRawMany() `addSelect` ile eklediğimiz
     // `reviewCount` ve `avgRating` gibi hesaplanmış ham SQL alanlarını da içeren verileri döner.
     const products = await queryBuilder.getRawMany();
-    return products;
+    return {
+      products,
+      totalProducts,
+      limit
+    };
   }
 
   async findOne(id: number): Promise<ProductEntity> {

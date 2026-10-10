@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, UseInterceptors } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -9,6 +9,8 @@ import { CurrentUser } from 'src/utility/decorators/current-user.decorator';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { ProductEntity } from './entities/product.entity';
 import { FilterProductDto } from './dto/filter-product.dto';
+import { SerializeIncludes, } from 'src/utility/interceptors/serialize.interceptor';
+import { ProductDto } from './dto/products.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -23,9 +25,13 @@ export class ProductsController {
     return await this.productsService.create(createProductDto, currentUser);
   }
 
-  // Controller'da:
+  @SerializeIncludes(ProductDto)
   @Get('all')
-  async findAll(@Query() query: FilterProductDto): Promise<any> {
+  async findAll(@Query() query: FilterProductDto): Promise<{
+    products: ProductDto[],
+    totalProducts: number,
+    limit: number
+  }> {
     return await this.productsService.findAll(query);
   }
 
