@@ -339,13 +339,13 @@ constructor(
 npm install
 ```
 
-### 2. Configure Environment Variables (`.env`)
+### 2. Configure Environment Variables (`.env`) For Testing Purpose 
 Create a `.env` file in the root directory:
 ```env
 PORT=3000
-DATABASE_URL=postgres://username:password@ep-xyz.neon.tech/neondb?sslmode=require
-JWT_SECRET=super_secret_jwt_key
-JWT_EXPIRES_IN=1d
+DATABASE_URL=
+JWT_SECRET=
+JWT_EXPIRES_IN=
 ```
 
 ### 3. Run Development Server
